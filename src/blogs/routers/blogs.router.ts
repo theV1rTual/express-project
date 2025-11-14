@@ -9,6 +9,7 @@ import {
 import { inputValidationResultMiddleware } from '../../core/middlewares/validation/input-validation-result.middleware';
 import { updateBlogsHandler } from './handlers/update-blogs.handler';
 import { superAdminGuardMiddleware } from '../../auth/middlewares/super-admin.guard-middleware';
+import { deleteBlogHandler } from './handlers/delete-blog.handler';
 
 export const blogsRouter = Router({});
 
@@ -28,4 +29,5 @@ blogsRouter
     blogUpdateInputValidation,
     inputValidationResultMiddleware,
     updateBlogsHandler,
-  );
+  )
+  .delete('/', superAdminGuardMiddleware, deleteBlogHandler);

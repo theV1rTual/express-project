@@ -30,4 +30,15 @@ export const blogsRepository = {
 
     return;
   },
+
+  delete(id: number): void {
+    const index = db.blogs.findIndex((blog) => blog.id === id);
+
+    if (index === -1) {
+      throw new Error('Blog not exists');
+    }
+
+    db.blogs.splice(index, 1);
+    return;
+  },
 };
