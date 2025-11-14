@@ -11,7 +11,7 @@ import { HttpStatuses } from '../../types/http-statuses';
 export const createErrorMessages = (
   errors: ValidationErrorType[],
 ): ValidationErrorDto => {
-  return { errorMessages: errors };
+  return { errorsMessages: errors };
 };
 
 const formatErrors = (error: ValidationError): ValidationErrorType => {
