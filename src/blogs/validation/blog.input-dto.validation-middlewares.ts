@@ -1,5 +1,8 @@
 import { body } from 'express-validator';
 
+const WEBSITE_RE =
+  /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/;
+
 const nameValidation = body('name')
   .isString()
   .withMessage('Name should be string')
@@ -20,9 +23,7 @@ const websiteUrlValidation = body('websiteUrl')
   .trim()
   .isLength({ max: 100 })
   .withMessage('Length of websiteUrl cannot be more than 100')
-  .matches(
-    '/^https:\\/\\/([a-zA-Z0-9_-]+\\.)+[a-zA-Z0-9_-]+(\\/[a-zA-Z0-9_-]+)*\\/?$/',
-  )
+  .matches(WEBSITE_RE)
   .withMessage('websiteUrl should be a valid https URL');
 
 export const blogCreateInputValidation = [
