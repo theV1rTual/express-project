@@ -21,8 +21,9 @@ const websiteUrlValidation = body('websiteUrl')
   .isLength({ max: 100 })
   .withMessage('Length of websiteUrl cannot be more than 100')
   .matches(
-    '^https://([a-zA-Z0-9_-]+\\.)+[a-zA-Z0-9_-]+(\\/[a-zA-Z0-9_-]+)*\\/?$\n',
-  );
+    '/^https:\\/\\/([a-zA-Z0-9_-]+\\.)+[a-zA-Z0-9_-]+(\\/[a-zA-Z0-9_-]+)*\\/?$/',
+  )
+  .withMessage('websiteUrl should be a valid https URL');
 
 export const blogCreateInputValidation = [
   nameValidation,
