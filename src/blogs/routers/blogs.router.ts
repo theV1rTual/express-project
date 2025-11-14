@@ -24,10 +24,10 @@ blogsRouter
     createBlogHandler,
   )
   .put(
-    '/',
+    '/:id',
     superAdminGuardMiddleware,
     blogUpdateInputValidation,
     inputValidationResultMiddleware,
     updateBlogsHandler,
   )
-  .delete('/', superAdminGuardMiddleware, deleteBlogHandler);
+  .delete('/:id', superAdminGuardMiddleware, deleteBlogHandler);
