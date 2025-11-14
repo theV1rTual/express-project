@@ -4,7 +4,7 @@ import { HttpStatuses } from '../../../core/types/http-statuses';
 import { createErrorMessages } from '../../../core/utils/error.utils';
 
 export function deleteBlogHandler(req: Request, res: Response) {
-  const id = parseInt(req.params.id);
+  const id = req.params.id;
   const blog = blogsRepository.findById(id);
 
   if (!blog) {

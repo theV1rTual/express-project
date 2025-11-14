@@ -7,7 +7,7 @@ export function updateBlogsHandler(
   req: Request<{ id: string }, {}, BlogInputDto>,
   res: Response,
 ) {
-  const id = parseInt(req.params.id);
+  const id = req.params.id;
   const blog = blogsRepository.findById(id);
 
   if (!blog) {

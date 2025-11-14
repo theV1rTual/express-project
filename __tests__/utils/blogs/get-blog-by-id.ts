@@ -5,7 +5,7 @@ import { BLOGS_PATH } from '../../../src/core/paths/paths';
 import { generateAdminAuthToken } from '../generate-admin-auth-token';
 import { HttpStatuses } from '../../../src/core/types/http-statuses';
 
-export async function getBlogById(app: Express, blogId: number): Promise<Blog> {
+export async function getBlogById(app: Express, blogId: string): Promise<Blog> {
   const blogResponse = await request(app)
     .get(`${BLOGS_PATH}/${blogId}`)
     .set('Authorization', generateAdminAuthToken())

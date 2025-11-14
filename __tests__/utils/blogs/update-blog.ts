@@ -8,7 +8,7 @@ import { getBlogDto } from './get-blog-dto';
 
 export async function updateBlog(
   app: Express,
-  blogId: number,
+  blogId: string,
   blogDto?: BlogInputDto,
 ): Promise<void> {
   const testBlogData: BlogInputDto = {
