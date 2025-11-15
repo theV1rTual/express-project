@@ -11,10 +11,10 @@ export function getBlogHandler(req: Request, res: Response) {
     res
       .status(HttpStatuses.NOT_FOUND)
       .send(
-        createErrorMessages([{ field: 'id', message: 'Driver is not found' }]),
+        createErrorMessages([{ field: 'id', message: 'Blog is not found' }]),
       );
     return;
   }
 
-  res.status(200).send(blog);
+  res.status(HttpStatuses.OK).send(blog);
 }
