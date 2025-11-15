@@ -26,9 +26,7 @@ export const postsRepository = {
 
     post.title = dto.title;
     post.blogId = dto.blogId;
-    post.blogName = dto.blogName;
     post.content = dto.content;
-    post.title = dto.title;
     post.shortDescription = dto.shortDescription;
 
     return;
