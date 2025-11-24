@@ -1,5 +1,7 @@
+import { ObjectId } from 'mongodb';
+
 export type Blog = {
-  id: string;
+  id: ObjectId;
   name: string;
   description: string;
   websiteUrl: string;
