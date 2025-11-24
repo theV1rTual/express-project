@@ -6,21 +6,22 @@ import { postsRepository } from '../../repositories/posts.repository';
 import { HttpStatuses } from '../../../core/types/http-statuses';
 import { blogsRepository } from '../../../blogs/repositories/blogs.repository';
 
-export function createPostHandler(
+export async function createPostHandler(
   req: Request<{}, {}, PostInputDto>,
   res: Response,
 ) {
-  const blog = blogsRepository.findById(req.body.blogId);
+  const blog = await blogsRepository.findById(req.body.blogId);
 
   const newPost: Post = {
     id: db.posts.length ? db.posts[db.posts.length - 1].id + 1 : '1',
-    shortDescription: req.body.shortDescription,
     title: req.body.title,
+    shortDescription: req.body.shortDescription,
     content: req.body.content,
     blogId: req.body.blogId,
-    blogName: blog?.name ?? '',
+    blogName: blog?.name as string,
+    createdAt: new Date(),
   };
 
-  postsRepository.create(newPost);
+  await postsRepository.create(newPost);
   res.status(HttpStatuses.CREATED).send(newPost);
 }

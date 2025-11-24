@@ -3,9 +3,9 @@ import { postsRepository } from '../../repositories/posts.repository';
 import { HttpStatuses } from '../../../core/types/http-statuses';
 import { createErrorMessages } from '../../../core/utils/error.utils';
 
-export function deletePostHandler(req: Request, res: Response) {
+export async function deletePostHandler(req: Request, res: Response) {
   const id = req.params.id;
-  const post = postsRepository.findById(id);
+  const post = await postsRepository.findById(id);
 
   if (!post) {
     res
@@ -14,6 +14,6 @@ export function deletePostHandler(req: Request, res: Response) {
     return;
   }
 
-  postsRepository.delete(id);
+  await postsRepository.delete(id);
   res.sendStatus(HttpStatuses.NO_CONTENT);
 }

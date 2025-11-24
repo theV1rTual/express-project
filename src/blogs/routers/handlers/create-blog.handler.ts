@@ -5,7 +5,7 @@ import { db } from '../../../db/in-memory.db';
 import { blogsRepository } from '../../repositories/blogs.repository';
 import { HttpStatuses } from '../../../core/types/http-statuses';
 
-export function createBlogHandler(
+export async function createBlogHandler(
   req: Request<{}, {}, BlogInputDto>,
   res: Response,
 ) {
@@ -14,8 +14,10 @@ export function createBlogHandler(
     description: req.body.description,
     name: req.body.name,
     websiteUrl: req.body.websiteUrl,
+    createdAt: new Date(),
+    isMembership: true,
   };
 
-  blogsRepository.create(newBlog);
+  await blogsRepository.create(newBlog);
   res.status(HttpStatuses.CREATED).send(newBlog);
 }

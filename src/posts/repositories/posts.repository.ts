@@ -1,45 +1,59 @@
 import { Post } from '../types/Post';
-import { db } from '../../db/in-memory.db';
 import { PostInputDto } from '../dto/post.input-dto';
+import { postsCollection } from '../../db/mongo.db';
+import { ObjectId, WithId } from 'mongodb';
 
 export const postsRepository = {
-  findAll(): Post[] {
-    return db.posts;
+  async findAll(): Promise<WithId<Post>[]> {
+    return postsCollection.find().toArray();
   },
 
-  findById(id: string): Post | null {
-    return db.posts.find((post: Post) => post.id === id) ?? null;
+  async findById(id: string): Promise<WithId<Post> | null> {
+    return postsCollection.findOne({ _id: new ObjectId(id) });
   },
 
-  create(newPost: Post): Post {
-    db.posts.push(newPost);
-
-    return newPost;
+  async create(newPost: Post): Promise<WithId<Post>> {
+    const insertedResult = await postsCollection.insertOne(newPost);
+    return { ...newPost, _id: insertedResult.insertedId };
   },
 
-  update(id: string, dto: PostInputDto): void {
-    const post = db.posts.find((post: Post) => post.id === id);
+  async update(id: string, dto: PostInputDto): Promise<void> {
+    const post = await postsCollection.findOne({ _id: new ObjectId(id) });
 
     if (!post) {
       throw new Error('Post not exists');
     }
 
-    post.title = dto.title;
-    post.blogId = dto.blogId;
-    post.content = dto.content;
-    post.shortDescription = dto.shortDescription;
+    const updatedResult = await postsCollection.updateOne(
+      {
+        _id: new ObjectId(id),
+      },
+      {
+        $set: {
+          title: dto.title,
+          blogId: dto.blogId,
+          content: dto.content,
+          shortDescription: dto.shortDescription,
+        },
+      },
+    );
+
+    if (updatedResult.matchedCount < 1) {
+      throw new Error('Post not exists');
+    }
 
     return;
   },
 
-  delete(id: string): void {
-    const index = db.posts.findIndex((post: Post) => post.id === id);
+  async delete(id: string): Promise<void> {
+    const deletedResult = await postsCollection.deleteOne({
+      _id: new ObjectId(id),
+    });
 
-    if (index === -1) {
+    if (deletedResult.deletedCount < 1) {
       throw new Error('Post not exists');
     }
 
-    db.posts.splice(index, 1);
     return;
   },
 };

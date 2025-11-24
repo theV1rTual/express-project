@@ -4,12 +4,12 @@ import { postsRepository } from '../../repositories/posts.repository';
 import { HttpStatuses } from '../../../core/types/http-statuses';
 import { createErrorMessages } from '../../../core/utils/error.utils';
 
-export function updatePostHandler(
+export async function updatePostHandler(
   req: Request<{ id: string }, {}, PostInputDto>,
   res: Response,
 ) {
   const id = req.params.id;
-  const post = postsRepository.findById(id);
+  const post = await postsRepository.findById(id);
 
   if (!post) {
     res
@@ -19,6 +19,6 @@ export function updatePostHandler(
     return;
   }
 
-  postsRepository.update(id, req.body);
+  await postsRepository.update(id, req.body);
   res.sendStatus(HttpStatuses.NO_CONTENT);
 }

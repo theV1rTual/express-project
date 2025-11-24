@@ -3,12 +3,12 @@ import { Request, Response } from 'express';
 import { blogsRepository } from '../../repositories/blogs.repository';
 import { HttpStatuses } from '../../../core/types/http-statuses';
 
-export function updateBlogsHandler(
+export async function updateBlogsHandler(
   req: Request<{ id: string }, {}, BlogInputDto>,
   res: Response,
 ) {
   const id = req.params.id;
-  const blog = blogsRepository.findById(id);
+  const blog = await blogsRepository.findById(id);
 
   if (!blog) {
     res
@@ -18,6 +18,6 @@ export function updateBlogsHandler(
     return;
   }
 
-  blogsRepository.update(id, req.body);
+  await blogsRepository.update(id, req.body);
   res.sendStatus(HttpStatuses.NO_CONTENT);
 }
