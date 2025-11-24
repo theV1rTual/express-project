@@ -55,4 +55,8 @@ export const blogsRepository = {
 
     return;
   },
+
+  async clear(): Promise<void> {
+    await blogsCollection.deleteMany({});
+  },
 };

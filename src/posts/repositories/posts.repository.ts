@@ -56,4 +56,8 @@ export const postsRepository = {
 
     return;
   },
+
+  async clear(): Promise<void> {
+    await postsCollection.deleteMany({});
+  },
 };
