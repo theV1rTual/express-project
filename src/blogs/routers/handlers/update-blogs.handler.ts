@@ -18,6 +18,12 @@ export async function updateBlogsHandler(
     return;
   }
 
-  await blogsRepository.update(id, req.body);
-  res.sendStatus(HttpStatuses.NO_CONTENT);
+  const isUpdated = await blogsRepository.update(id, req.body);
+
+  if (!isUpdated) {
+    res.sendStatus(404);
+    return;
+  }
+
+  res.sendStatus(204);
 }

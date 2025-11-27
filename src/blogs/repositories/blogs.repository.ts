@@ -1,7 +1,7 @@
 import { BlogViewModel } from '../types/BlogViewModel';
 import { BlogInputDto } from '../dto/blog.input-dto';
 import { blogsCollection } from '../../db/mongo.db';
-import { ObjectId, WithId } from 'mongodb';
+import { ObjectId } from 'mongodb';
 import { BlogDbModel } from '../types/BlogDbModel';
 import { mapBlogDbToViewModel } from '../routers/mappers/mapBlogDbToBlogView';
 
@@ -33,7 +33,7 @@ export const blogsRepository = {
     return mapBlogDbToViewModel(docToInsert);
   },
 
-  async update(id: string, dto: BlogInputDto): Promise<void> {
+  async update(id: string, dto: BlogInputDto): Promise<boolean> {
     const blog = await blogsCollection.findOne({ _id: new ObjectId(id) });
 
     if (!blog) {
@@ -53,23 +53,15 @@ export const blogsRepository = {
       },
     );
 
-    if (updatedResult.matchedCount < 1) {
-      throw new Error('Blog not exists');
-    }
-
-    return;
+    return updatedResult.matchedCount === 1;
   },
 
-  async delete(id: string): Promise<void> {
+  async delete(id: string): Promise<boolean> {
     const deletedResult = await blogsCollection.deleteOne({
       _id: new ObjectId(id),
     });
 
-    if (deletedResult.deletedCount < 1) {
-      throw new Error('Blog not exists');
-    }
-
-    return;
+    return deletedResult.deletedCount === 1;
   },
 
   async clear(): Promise<void> {
