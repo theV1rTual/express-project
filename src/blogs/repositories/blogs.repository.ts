@@ -3,14 +3,19 @@ import { BlogInputDto } from '../dto/blog.input-dto';
 import { blogsCollection } from '../../db/mongo.db';
 import { ObjectId, WithId } from 'mongodb';
 import { BlogDbModel } from '../types/BlogDbModel';
+import { mapBlogDbToViewModel } from '../routers/mappers/mapBlogDbToBlogView';
 
 export const blogsRepository = {
-  async findAll(): Promise<WithId<BlogDbModel>[]> {
-    return blogsCollection.find().toArray();
+  async findAll(): Promise<BlogViewModel[]> {
+    const blogs = await blogsCollection.find().toArray();
+    return blogs.map(mapBlogDbToViewModel);
   },
 
-  async findById(id: string): Promise<BlogDbModel | null> {
-    return blogsCollection.findOne({ _id: new ObjectId(id) });
+  async findById(id: string): Promise<BlogViewModel | null> {
+    const blogDb = await blogsCollection.findOne({ _id: new ObjectId(id) });
+    if (!blogDb) return null;
+
+    return mapBlogDbToViewModel(blogDb);
   },
 
   async create(newBlog: BlogInputDto): Promise<BlogViewModel> {
@@ -23,16 +28,9 @@ export const blogsRepository = {
       _id: new ObjectId(),
     };
 
-    const insertedResult = await blogsCollection.insertOne(docToInsert);
+    await blogsCollection.insertOne(docToInsert);
 
-    return {
-      id: insertedResult.insertedId.toString(),
-      name: newBlog.name,
-      description: newBlog.description,
-      websiteUrl: newBlog.websiteUrl,
-      createdAt: new Date(),
-      isMembership: false,
-    };
+    return mapBlogDbToViewModel(docToInsert);
   },
 
   async update(id: string, dto: BlogInputDto): Promise<void> {
