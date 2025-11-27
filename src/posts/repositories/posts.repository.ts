@@ -25,7 +25,7 @@ export const postsRepository = {
 
     const docToInsert: PostDbModel = {
       _id: new ObjectId(),
-      createdAt: new Date(),
+      createdAt: new Date().toISOString(),
       shortDescription: newPost.shortDescription,
       content: newPost.content,
       title: newPost.title,
@@ -37,12 +37,6 @@ export const postsRepository = {
   },
 
   async update(id: string, dto: PostInputDto): Promise<boolean> {
-    const post = await postsCollection.findOne({ _id: new ObjectId(id) });
-
-    if (!post) {
-      throw new Error('Post not exists');
-    }
-
     const updatedResult = await postsCollection.updateOne(
       {
         _id: new ObjectId(id),
