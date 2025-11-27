@@ -14,6 +14,11 @@ export async function deletePostHandler(req: Request, res: Response) {
     return;
   }
 
-  await postsRepository.delete(id);
-  res.sendStatus(HttpStatuses.NO_CONTENT);
+  const isDeleted = await postsRepository.delete(id);
+  if (!isDeleted) {
+    res.sendStatus(404); // NOT_FOUND
+    return;
+  }
+
+  res.sendStatus(204); // NO_CONTENT
 }

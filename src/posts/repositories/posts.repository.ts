@@ -1,23 +1,42 @@
-import { Post } from '../types/Post';
+import { PostViewModel } from '../types/PostViewModel';
 import { PostInputDto } from '../dto/post.input-dto';
 import { postsCollection } from '../../db/mongo.db';
-import { ObjectId, WithId } from 'mongodb';
+import { ObjectId } from 'mongodb';
+import { mapPostDbToPostView } from '../routers/mappers/mapPostDbToPostView';
+import { PostDbModel } from '../types/PostDbModel';
+import { blogsRepository } from '../../blogs/repositories/blogs.repository';
 
 export const postsRepository = {
-  async findAll(): Promise<WithId<Post>[]> {
-    return postsCollection.find().toArray();
+  async findAll(): Promise<PostViewModel[]> {
+    const posts = await postsCollection.find().toArray();
+    return posts.map(mapPostDbToPostView);
   },
 
-  async findById(id: string): Promise<WithId<Post> | null> {
-    return postsCollection.findOne({ _id: new ObjectId(id) });
+  async findById(id: string): Promise<PostViewModel | null> {
+    const postDb = await postsCollection.findOne({ _id: new ObjectId(id) });
+    if (!postDb) {
+      return null;
+    }
+    return mapPostDbToPostView(postDb);
   },
 
-  async create(newPost: Post): Promise<WithId<Post>> {
-    const insertedResult = await postsCollection.insertOne(newPost);
-    return { ...newPost, _id: insertedResult.insertedId };
+  async create(newPost: PostInputDto): Promise<PostViewModel> {
+    const blog = await blogsRepository.findById(newPost.blogId);
+
+    const docToInsert: PostDbModel = {
+      _id: new ObjectId(),
+      createdAt: new Date(),
+      shortDescription: newPost.shortDescription,
+      content: newPost.content,
+      title: newPost.title,
+      blogId: newPost.blogId,
+      blogName: blog?.name as string,
+    };
+    await postsCollection.insertOne(docToInsert);
+    return mapPostDbToPostView(docToInsert);
   },
 
-  async update(id: string, dto: PostInputDto): Promise<void> {
+  async update(id: string, dto: PostInputDto): Promise<boolean> {
     const post = await postsCollection.findOne({ _id: new ObjectId(id) });
 
     if (!post) {
@@ -38,23 +57,15 @@ export const postsRepository = {
       },
     );
 
-    if (updatedResult.matchedCount < 1) {
-      throw new Error('Post not exists');
-    }
-
-    return;
+    return updatedResult.matchedCount === 1;
   },
 
-  async delete(id: string): Promise<void> {
+  async delete(id: string): Promise<boolean> {
     const deletedResult = await postsCollection.deleteOne({
       _id: new ObjectId(id),
     });
 
-    if (deletedResult.deletedCount < 1) {
-      throw new Error('Post not exists');
-    }
-
-    return;
+    return deletedResult.deletedCount === 1;
   },
 
   async clear(): Promise<void> {

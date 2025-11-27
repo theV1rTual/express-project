@@ -19,6 +19,11 @@ export async function updatePostHandler(
     return;
   }
 
-  await postsRepository.update(id, req.body);
-  res.sendStatus(HttpStatuses.NO_CONTENT);
+  const isUpdated = await postsRepository.update(id, req.body);
+  if (!isUpdated) {
+    res.sendStatus(404);
+    return;
+  }
+
+  res.sendStatus(204);
 }
