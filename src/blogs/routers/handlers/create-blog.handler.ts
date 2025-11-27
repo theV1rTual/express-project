@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { BlogInputDto } from '../../dto/blog.input-dto';
-import { Blog } from '../../types/Blog';
+import { BlogViewModel } from '../../types/BlogViewModel';
 import { blogsRepository } from '../../repositories/blogs.repository';
 import { HttpStatuses } from '../../../core/types/http-statuses';
 
@@ -12,10 +12,8 @@ export async function createBlogHandler(
     description: req.body.description,
     name: req.body.name,
     websiteUrl: req.body.websiteUrl,
-    createdAt: new Date(),
-    isMembership: false,
   };
 
-  let createdBlog: Blog = await blogsRepository.create(newBlog);
+  let createdBlog: BlogViewModel = await blogsRepository.create(newBlog);
   res.status(HttpStatuses.CREATED).send(createdBlog);
 }

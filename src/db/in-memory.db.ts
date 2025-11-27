@@ -1,7 +1,7 @@
-import { Blog } from '../blogs/types/Blog';
+import { BlogViewModel } from '../blogs/types/BlogViewModel';
 import { Post } from '../posts/types/Post';
 
-export const db: { posts: Post[]; blogs: Blog[] } = {
+export const db: { posts: Post[]; blogs: BlogViewModel[] } = {
   posts: [],
   blogs: [],
 };

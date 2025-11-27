@@ -1,27 +1,38 @@
-import { Blog } from '../types/Blog';
+import { BlogViewModel } from '../types/BlogViewModel';
 import { BlogInputDto } from '../dto/blog.input-dto';
 import { blogsCollection } from '../../db/mongo.db';
 import { ObjectId, WithId } from 'mongodb';
+import { BlogDbModel } from '../types/BlogDbModel';
 
 export const blogsRepository = {
-  async findAll(): Promise<WithId<Blog>[]> {
+  async findAll(): Promise<WithId<BlogDbModel>[]> {
     return blogsCollection.find().toArray();
   },
 
-  async findById(id: string): Promise<WithId<Blog> | null> {
+  async findById(id: string): Promise<BlogDbModel | null> {
     return blogsCollection.findOne({ _id: new ObjectId(id) });
   },
 
-  async create(newBlog: BlogInputDto): Promise<Blog> {
-    const insertedResult = await blogsCollection.insertOne({
-      createdAt: newBlog.createdAt,
-      isMembership: newBlog.isMembership,
-      description: newBlog.description,
+  async create(newBlog: BlogInputDto): Promise<BlogViewModel> {
+    const docToInsert: BlogDbModel = {
       name: newBlog.name,
+      description: newBlog.description,
       websiteUrl: newBlog.websiteUrl,
-      id: new ObjectId(),
-    });
-    return { ...newBlog, id: insertedResult.insertedId };
+      createdAt: new Date(),
+      isMembership: false,
+      _id: new ObjectId(),
+    };
+
+    const insertedResult = await blogsCollection.insertOne(docToInsert);
+
+    return {
+      id: insertedResult.insertedId.toString(),
+      name: newBlog.name,
+      description: newBlog.description,
+      websiteUrl: newBlog.websiteUrl,
+      createdAt: new Date(),
+      isMembership: false,
+    };
   },
 
   async update(id: string, dto: BlogInputDto): Promise<void> {
