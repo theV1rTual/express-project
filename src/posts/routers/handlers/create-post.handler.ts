@@ -11,7 +11,7 @@ export async function createPostHandler(
     title: req.body.title,
     shortDescription: req.body.shortDescription,
     content: req.body.content,
-    blogId: req.body.blogId,
+    blogId: req.query.id as string,
   };
 
   const createdPost = await postsRepository.create(newPost);
