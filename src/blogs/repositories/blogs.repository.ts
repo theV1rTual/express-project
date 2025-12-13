@@ -4,11 +4,30 @@ import { blogsCollection } from '../../db/mongo.db';
 import { ObjectId } from 'mongodb';
 import { BlogDbModel } from '../types/BlogDbModel';
 import { mapBlogDbToViewModel } from '../routers/mappers/mapBlogDbToBlogView';
+import { BlogQueryInput } from '../routers/input/blog-query.input';
 
 export const blogsRepository = {
-  async findAll(): Promise<BlogViewModel[]> {
-    const blogs = await blogsCollection.find().toArray();
-    return blogs.map(mapBlogDbToViewModel);
+  async findAll(
+    queryDto: BlogQueryInput,
+  ): Promise<{ items: BlogDbModel[]; totalCount: number }> {
+    const { page, pageSize, sortBy, sortDirection, searchNameTerm } = queryDto;
+
+    const skip = (page - 1) * pageSize;
+    const filter: any = {};
+
+    if (searchNameTerm) {
+      filter.name = { $regex: searchNameTerm, $options: 'i' };
+    }
+
+    const items = await blogsCollection
+      .find(filter)
+      .sort({ [sortBy]: sortDirection })
+      .skip(skip)
+      .limit(pageSize)
+      .toArray();
+    const totalCount = await blogsCollection.countDocuments(filter);
+
+    return { items, totalCount };
   },
 
   async findById(id: string): Promise<BlogViewModel | null> {

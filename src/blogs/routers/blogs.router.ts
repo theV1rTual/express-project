@@ -10,11 +10,13 @@ import { inputValidationResultMiddleware } from '../../core/middlewares/validati
 import { updateBlogsHandler } from './handlers/update-blogs.handler';
 import { superAdminGuardMiddleware } from '../../auth/middlewares/super-admin.guard-middleware';
 import { deleteBlogHandler } from './handlers/delete-blog.handler';
+import { paginationAndSortingValidation } from '../../core/middlewares/validation/query-pagination-sorting.validation-middleware';
+import { BlogSortField } from './input/blog-sort-field';
 
 export const blogsRouter = Router({});
 
 blogsRouter
-  .get('', getBlogsListHandler)
+  .get('', paginationAndSortingValidation(BlogSortField), getBlogsListHandler)
   .get('/:id', getBlogHandler)
   .post(
     '/',
