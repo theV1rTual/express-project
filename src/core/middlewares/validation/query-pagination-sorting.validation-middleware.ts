@@ -8,7 +8,7 @@ const DEFAULT_SORT_DIRECTION = SortDirection.Descending;
 const DEFAULT_SORT_BY = 'createdAt';
 
 export const paginationAndSortingDefault: PaginationAndSorting<string> = {
-  page: DEFAULT_PAGE_NUMBER,
+  pageNumber: DEFAULT_PAGE_NUMBER,
   pageSize: DEFAULT_PAGE_SIZE,
   sortBy: DEFAULT_SORT_BY,
   sortDirection: DEFAULT_SORT_DIRECTION,

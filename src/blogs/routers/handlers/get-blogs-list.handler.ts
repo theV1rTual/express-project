@@ -16,7 +16,7 @@ export async function getBlogsListHandler(req: Request, res: Response) {
     const { items, totalCount } = await blogsService.findMany(queryInput);
 
     const blogsListOutput = mapToBlogListPaginatedOutput(items, {
-      page: queryInput.page,
+      page: queryInput.pageNumber,
       pageSize: queryInput.pageSize,
       totalCount,
     });

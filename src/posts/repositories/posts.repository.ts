@@ -11,9 +11,9 @@ export const postsRepository = {
   async findAll(
     queryDto: PostQueryInput,
   ): Promise<{ items: PostDbModel[]; totalCount: number }> {
-    const { page, pageSize, sortBy, sortDirection } = queryDto;
+    const { pageNumber, pageSize, sortBy, sortDirection } = queryDto;
 
-    const skip = (page - 1) * pageSize;
+    const skip = (pageNumber - 1) * pageSize;
     const filter: any = {};
 
     const items = await postsCollection

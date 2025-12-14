@@ -10,9 +10,10 @@ export const blogsRepository = {
   async findAll(
     queryDto: BlogQueryInput,
   ): Promise<{ items: BlogDbModel[]; totalCount: number }> {
-    const { page, pageSize, sortBy, sortDirection, searchNameTerm } = queryDto;
+    const { pageNumber, pageSize, sortBy, sortDirection, searchNameTerm } =
+      queryDto;
 
-    const skip = (page - 1) * pageSize;
+    const skip = (pageNumber - 1) * pageSize;
     const filter: any = {};
 
     if (searchNameTerm) {
