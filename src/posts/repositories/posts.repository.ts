@@ -19,9 +19,11 @@ export const postsRepository = {
       filter.blogId = blogId;
     }
 
+    const mongoSortDirection = sortDirection === 'asc' ? 1 : -1;
+
     const items = await postsCollection
       .find(filter)
-      .sort({ [sortBy]: sortDirection })
+      .sort({ [sortBy]: mongoSortDirection })
       .skip(skip)
       .limit(pageSize)
       .toArray();
