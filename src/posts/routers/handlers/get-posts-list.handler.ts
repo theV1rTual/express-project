@@ -14,7 +14,7 @@ export async function getPostsListHandler(req: Request, res: Response) {
       includeOptionals: true,
     });
 
-    const blogId = req.params.blogId;
+    const blogId = req.params.id;
     const queryInput = setDefaultSortAndPagination({
       ...sanitizedQuery,
       ...(blogId ? { blogId } : {}),
