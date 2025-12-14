@@ -10,6 +10,10 @@ export function mapToBlogListPaginatedOutput(
   },
 ): PostListPaginatedOutput {
   return {
+    pagesCount: Math.ceil(meta.totalCount / meta.pageSize),
+    page: meta.page,
+    pageSize: meta.pageSize,
+    totalCount: meta.totalCount,
     items: posts.map((post) => ({
       id: post._id.toString(),
       createdAt: post.createdAt,
@@ -19,9 +23,5 @@ export function mapToBlogListPaginatedOutput(
       blogId: post.blogId,
       shortDescription: post.shortDescription,
     })),
-    pageSize: meta.pageSize,
-    page: meta.page,
-    totalCount: meta.totalCount,
-    pagesCount: Math.ceil(meta.totalCount / meta.pageSize),
   };
 }
