@@ -21,6 +21,6 @@ export function mapToBlogListPaginatedOutput(
     pageSize: meta.pageSize,
     page: meta.page,
     totalCount: meta.totalCount,
-    pageCount: Math.ceil(meta.totalCount / meta.pageSize),
+    pagesCount: Math.ceil(meta.totalCount / meta.pageSize),
   };
 }
