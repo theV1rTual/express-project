@@ -16,11 +16,11 @@ export function mapToBlogListPaginatedOutput(
     totalCount: meta.totalCount,
     items: blogs.map((blog) => ({
       id: blog._id.toString(),
-      isMembership: blog.isMembership,
-      createdAt: blog.createdAt,
-      websiteUrl: blog.websiteUrl,
-      description: blog.description,
       name: blog.name,
+      description: blog.description,
+      websiteUrl: blog.websiteUrl,
+      createdAt: blog.createdAt,
+      isMembership: blog.isMembership,
     })),
   };
 }

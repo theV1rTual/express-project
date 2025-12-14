@@ -3,7 +3,7 @@ import { matchedData } from 'express-validator';
 import { PostQueryInput } from '../input /post-query.input';
 import { setDefaultSortAndPagination } from '../../../core/helpers/set-default-sort-and-pagination';
 import { postsService } from '../../application/posts.service';
-import { mapToBlogListPaginatedOutput } from '../mappers/mapToBlogListPaginatedOutput.utils';
+import { mapToBlogListPaginatedOutput } from '../mappers/mapToPostListPaginatedOutput.utils';
 import { errorsHandler } from '../../../core/errors/errors.handler';
 
 export async function getPostsListHandler(req: Request, res: Response) {

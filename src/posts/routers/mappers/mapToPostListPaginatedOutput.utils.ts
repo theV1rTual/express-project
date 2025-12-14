@@ -16,12 +16,12 @@ export function mapToBlogListPaginatedOutput(
     totalCount: meta.totalCount,
     items: posts.map((post) => ({
       id: post._id.toString(),
-      createdAt: post.createdAt,
       blogName: post.blogName,
-      content: post.content,
-      title: post.title,
       blogId: post.blogId,
+      content: post.content,
       shortDescription: post.shortDescription,
+      createdAt: post.createdAt,
+      title: post.title,
     })),
   };
 }
