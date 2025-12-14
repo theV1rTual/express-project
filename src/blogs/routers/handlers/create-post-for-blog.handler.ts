@@ -12,11 +12,6 @@ export async function createPostForBlogHandler(
 ) {
   const blogId = req.params.id;
 
-  if (!ObjectId.isValid(blogId)) {
-    res.sendStatus(HttpStatuses.NOT_FOUND);
-    return;
-  }
-
   const newPost: PostInputDto = {
     title: req.body.title,
     blogId,
