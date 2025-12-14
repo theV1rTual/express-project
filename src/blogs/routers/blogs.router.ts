@@ -13,7 +13,7 @@ import { deleteBlogHandler } from './handlers/delete-blog.handler';
 import { paginationAndSortingValidation } from '../../core/middlewares/validation/query-pagination-sorting.validation-middleware';
 import { BlogSortField } from './input/blog-sort-field';
 import { postCreateInputValidation } from '../../posts/validation/post.input-dto-validation-middlewares';
-import { createPostHandler } from '../../posts/routers/handlers/create-post.handler';
+import { createPostForBlogHandler } from './handlers/create-post-for-blog.handler';
 
 export const blogsRouter = Router({});
 
@@ -24,7 +24,7 @@ blogsRouter
     superAdminGuardMiddleware,
     postCreateInputValidation,
     inputValidationResultMiddleware,
-    createPostHandler,
+    createPostForBlogHandler,
   )
   .get('/:id', getBlogHandler)
   .post(
