@@ -21,6 +21,7 @@ export function paginationAndSortingValidation<T extends string>(
   const allowedSortFields = Object.values(sortFieldsEnum);
 
   return [
+    query('searchNameTerm').optional().isString().trim().isLength({ max: 100 }),
     query('pageNumber')
       .default(DEFAULT_PAGE_NUMBER)
       .isInt({ min: 1 })
