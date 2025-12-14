@@ -41,6 +41,12 @@ export const postCreateInputValidation = [
   blogIdValidation,
 ];
 
+export const postForBlogCreateInputValidation = [
+  titleValidation,
+  shortDescriptionValidation,
+  contentValidation,
+];
+
 export const postUpdateInputValidation = [
   titleValidation,
   shortDescriptionValidation,
