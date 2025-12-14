@@ -5,6 +5,7 @@ import { setDefaultSortAndPagination } from '../../../core/helpers/set-default-s
 import { postsService } from '../../application/posts.service';
 import { mapToBlogListPaginatedOutput } from '../mappers/mapToPostListPaginatedOutput.utils';
 import { errorsHandler } from '../../../core/errors/errors.handler';
+import { HttpStatuses } from '../../../core/types/http-statuses';
 
 export async function getPostsListHandler(req: Request, res: Response) {
   try {
@@ -12,13 +13,19 @@ export async function getPostsListHandler(req: Request, res: Response) {
       locations: ['query'],
       includeOptionals: true,
     });
-    const queryInput = setDefaultSortAndPagination(sanitizedQuery);
-    const { items, totalCount } = await postsService.findMany(queryInput);
 
-    const postsListOutput = mapToBlogListPaginatedOutput(items, {
+    const blogId = req.params.blogId;
+    const queryInput = setDefaultSortAndPagination({
+      ...sanitizedQuery,
+      ...(blogId ? { blogId } : {}),
+    });
+    const result = await postsService.findMany(queryInput);
+    if (!result) return res.sendStatus(HttpStatuses.NOT_FOUND);
+
+    const postsListOutput = mapToBlogListPaginatedOutput(result.items, {
       page: queryInput.pageNumber,
       pageSize: queryInput.pageSize,
-      totalCount,
+      totalCount: result.totalCount,
     });
 
     res.send(postsListOutput);
