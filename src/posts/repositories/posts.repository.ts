@@ -5,11 +5,26 @@ import { ObjectId } from 'mongodb';
 import { mapPostDbToPostView } from '../routers/mappers/mapPostDbToPostView';
 import { PostDbModel } from '../types/PostDbModel';
 import { blogsRepository } from '../../blogs/repositories/blogs.repository';
+import { PostQueryInput } from '../routers/input /post-query.input';
 
 export const postsRepository = {
-  async findAll(): Promise<PostViewModel[]> {
-    const posts = await postsCollection.find().toArray();
-    return posts.map(mapPostDbToPostView);
+  async findAll(
+    queryDto: PostQueryInput,
+  ): Promise<{ items: PostDbModel[]; totalCount: number }> {
+    const { page, pageSize, sortBy, sortDirection } = queryDto;
+
+    const skip = (page - 1) * pageSize;
+    const filter: any = {};
+
+    const items = await postsCollection
+      .find(filter)
+      .sort({ [sortBy]: sortDirection })
+      .skip(skip)
+      .limit(pageSize)
+      .toArray();
+
+    const totalCount = await postsCollection.countDocuments(filter);
+    return { items, totalCount };
   },
 
   async findById(id: string): Promise<PostViewModel | null> {

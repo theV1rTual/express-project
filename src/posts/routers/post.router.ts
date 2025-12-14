@@ -10,11 +10,13 @@ import {
   postCreateInputValidation,
   postUpdateInputValidation,
 } from '../validation/post.input-dto-validation-middlewares';
+import { paginationAndSortingValidation } from '../../core/middlewares/validation/query-pagination-sorting.validation-middleware';
+import { PostSortFields } from './input /post-sort-fields';
 
 export const postRouter = Router({});
 
 postRouter
-  .get('', getPostsListHandler)
+  .get('', paginationAndSortingValidation(PostSortFields), getPostsListHandler)
   .get('/:id', getPostHandler)
   .post(
     '/',
