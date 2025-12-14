@@ -35,8 +35,12 @@ export const postsRepository = {
     return mapPostDbToPostView(postDb);
   },
 
-  async create(newPost: PostInputDto): Promise<PostViewModel> {
+  async create(newPost: PostInputDto): Promise<PostViewModel | null> {
     const blog = await blogsRepository.findById(newPost.blogId);
+
+    if (!blog) {
+      return null;
+    }
 
     const docToInsert: PostDbModel = {
       _id: new ObjectId(),

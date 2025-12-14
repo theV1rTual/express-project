@@ -15,5 +15,8 @@ export async function createPostHandler(
   };
 
   const createdPost = await postsRepository.create(newPost);
+  if (!createdPost) {
+    res.sendStatus(404);
+  }
   res.status(HttpStatuses.CREATED).send(createdPost);
 }

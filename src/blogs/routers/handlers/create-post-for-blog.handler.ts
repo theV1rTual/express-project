@@ -25,5 +25,8 @@ export async function createPostForBlogHandler(
   };
 
   const createdPost = await postsRepository.create(newPost);
+  if (!createdPost) {
+    return res.sendStatus(HttpStatuses.NOT_FOUND);
+  }
   res.status(HttpStatuses.CREATED).send(createdPost);
 }
