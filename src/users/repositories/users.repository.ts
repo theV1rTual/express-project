@@ -54,23 +54,12 @@ export const usersRepository = {
     return mapUserDbToUserView(userDb);
   },
 
-  async findByLogin(login: string): Promise<boolean> {
-    const userDb = await usersCollection.findOne({ login });
-
-    if (userDb) {
-      return false;
-    }
-
-    return true;
+  async findByLogin(login: string) {
+    return usersCollection.findOne({ login });
   },
 
-  async findByEmail(email: string): Promise<boolean> {
-    const userDb = await usersCollection.findOne({ email });
-    if (userDb) {
-      return false;
-    }
-
-    return true;
+  async findByEmail(email: string) {
+    return usersCollection.findOne({ email });
   },
 
   async findByEmailOrLogin(emailOrLogin: string) {

@@ -13,12 +13,13 @@ export const userService = {
 
   async createUser(user: UserInputDto) {
     const login = user.login.trim();
+    const email = user.email.trim();
 
-    const exists = await usersRepository.findByEmail(login);
+    const loginExists = await usersRepository.findByLogin(login);
+    if (loginExists) return { field: 'login', message: 'login should be unique' };
 
-    if (exists) {
-      return null;
-    }
+    const emailExists = await usersRepository.findByEmail(email);
+    if (emailExists) return { field: 'email', message: 'email should be unique' };
 
     const passwordHash = await bcryptService.generateHash(user.password);
     return await usersRepository.createUser(user, passwordHash);
