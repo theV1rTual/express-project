@@ -22,6 +22,8 @@ export function paginationAndSortingValidation<T extends string>(
 
   return [
     query('searchNameTerm').optional().isString().trim().isLength({ max: 100 }),
+    query('searchLoginTerm').optional().isString().trim().isLength({ max: 100 }),
+    query('searchEmailTerm').optional().isString().trim().isLength({ max: 100 }),
     query('pageNumber')
       .default(DEFAULT_PAGE_NUMBER)
       .isInt({ min: 1 })
