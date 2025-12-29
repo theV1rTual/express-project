@@ -6,6 +6,7 @@ import { superAdminGuardMiddleware } from '../../auth/middlewares/super-admin.gu
 import { inputValidationResultMiddleware } from '../../core/middlewares/validation/input-validation-result.middleware';
 import { createUserHandler } from './handlers/create-user.handler';
 import { deleteUserHandler } from './handlers/delete-user.handler';
+import { userCreateInputValidation } from '../validation/user.input-dto.validation-middlewares';
 
 export const usersRouter = Router({});
 
@@ -14,6 +15,7 @@ usersRouter
   .post(
     '/',
     superAdminGuardMiddleware,
+    userCreateInputValidation,
     inputValidationResultMiddleware,
     createUserHandler,
   )

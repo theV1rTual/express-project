@@ -20,5 +20,5 @@ export async function deleteUserHandler(req: Request, res: Response) {
     return;
   }
 
-  res.sendStatus(HttpStatuses.CREATED);
+  res.sendStatus(HttpStatuses.NO_CONTENT);
 }
