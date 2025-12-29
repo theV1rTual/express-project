@@ -22,12 +22,15 @@ export const usersRepository = {
     const skip = (pageNumber - 1) * pageSize;
     const or: any[] = [];
 
-    if (searchEmailTerm) {
-      or.push({ login: { $regex: searchEmailTerm, $options: 'i' } });
+    const emailTerm = searchEmailTerm?.trim();
+    const loginTerm = searchLoginTerm?.trim();
+
+    if (emailTerm) {
+      or.push({ email: { $regex: searchEmailTerm, $options: 'i' } });
     }
 
-    if (searchLoginTerm) {
-      or.push({ email: { $regex: searchLoginTerm, $options: 'i' } });
+    if (loginTerm) {
+      or.push({ login: { $regex: searchLoginTerm, $options: 'i' } });
     }
 
     const filter = or.length ? { $or: or } : {};
