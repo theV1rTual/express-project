@@ -23,11 +23,11 @@ export const usersRepository = {
     const or: any[] = [];
 
     if (searchEmailTerm) {
-      or.push({ $regex: searchEmailTerm, $options: 'i' });
+      or.push({ login: { $regex: searchEmailTerm, $options: 'i' } });
     }
 
     if (searchLoginTerm) {
-      or.push({ $regex: searchLoginTerm, $options: 'i' });
+      or.push({ email: { $regex: searchLoginTerm, $options: 'i' } });
     }
 
     const filter = or.length ? { $or: or } : {};
