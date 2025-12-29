@@ -20,15 +20,17 @@ export const usersRepository = {
     } = queryDto;
 
     const skip = (pageNumber - 1) * pageSize;
-    const filter: any = {};
+    const or: any[] = [];
 
     if (searchEmailTerm) {
-      filter.email = { $regex: searchEmailTerm, $options: 'i' };
+      or.push({ $regex: searchEmailTerm, $options: 'i' });
     }
 
     if (searchLoginTerm) {
-      filter.login = { $regex: searchLoginTerm, $options: 'i' };
+      or.push({ $regex: searchLoginTerm, $options: 'i' });
     }
+
+    const filter = or.length ? { $or: or } : {};
 
     const mongoSortDirection = sortDirection === 'asc' ? 1 : -1;
 
