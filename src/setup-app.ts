@@ -5,6 +5,7 @@ import { testingRouter } from './testing/routers/testing.router';
 import { postRouter } from './posts/routers/post.router';
 import { usersRouter } from './users/routers/users.router';
 import { authRouter } from './auth/routers/auth.router';
+import { commentsRouter } from './comments/routers/comments.router';
 
 export const setupApp = (app: Express) => {
   app.use(express.json());
@@ -17,4 +18,5 @@ export const setupApp = (app: Express) => {
   app.use(routersPaths.blogs, blogsRouter);
   app.use(routersPaths.users, usersRouter);
   app.use(routersPaths.common, authRouter);
+  app.use(routersPaths.comments, commentsRouter);
 };

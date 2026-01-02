@@ -3,6 +3,7 @@ export const routersPaths = {
   users: '/users',
   testing: '/testing',
   posts: '/posts',
+  comments: '/comments',
   blogs: '/blogs',
   auth: {
     login: '/auth/login',
