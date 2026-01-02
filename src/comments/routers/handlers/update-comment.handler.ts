@@ -17,6 +17,12 @@ export async function updateCommentHandler(
     return;
   }
 
+  if (comment.commentatorInfo.userId !== req.user?.id) {
+    res
+      .status(HttpStatuses.FORBIDDEN)
+      .send([{ field: 'content', message: 'No access to modify comments' }]);
+  }
+
   const isUpdated = await commentRepository.update(id, req.body);
 
   if (!isUpdated) {

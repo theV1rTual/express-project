@@ -5,7 +5,7 @@ import { createErrorMessages } from '../../../core/utils/error.utils';
 
 export async function deleteCommentHandler(req: Request, res: Response) {
   const id = req.params.id;
-  const comment = commentRepository.findById(id);
+  const comment = await commentRepository.findById(id);
 
   if (!comment) {
     res
@@ -13,6 +13,14 @@ export async function deleteCommentHandler(req: Request, res: Response) {
       .send(
         createErrorMessages([{ field: 'id', message: 'comment not found' }]),
       );
+    return;
+  }
+
+  if (comment.commentatorInfo.userId !== req.user?.id) {
+    res
+      .status(HttpStatuses.FORBIDDEN)
+      .send([{ field: 'content', message: 'No access to modify comments' }]);
+
     return;
   }
 
