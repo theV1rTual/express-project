@@ -1,6 +1,6 @@
 import { body } from 'express-validator';
 
-const loginValidation = body('login')
+export const loginValidation = body('login')
   .isString()
   .withMessage('Login should be string')
   .trim()
@@ -11,7 +11,7 @@ const loginValidation = body('login')
   .matches('^[a-zA-Z0-9_-]*$')
   .withMessage('login should match the pattern');
 
-const passwordValidation = body('password')
+export const passwordValidation = body('password')
   .isString()
   .withMessage('Password should be string')
   .trim()
@@ -20,7 +20,7 @@ const passwordValidation = body('password')
   .notEmpty()
   .withMessage('Password cannot be empty');
 
-const emailValidation = body('email')
+export const emailValidation = body('email')
   .isString()
   .withMessage('Email should be string')
   .matches('^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$')

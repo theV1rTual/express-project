@@ -1,31 +1,68 @@
-import { AuthInputDto } from '../routers/input/auth.input';
-import { bcryptService } from '../adapters/bcrypt.service';
 import { usersRepository } from '../../users/repositories/users.repository';
+import { UserDbModel } from '../../users/types/UserDbModel';
+import { Result } from '../../core/result /result.type';
+import { ResultStatus } from '../../core/result /resultCode';
+import { bcryptService } from '../adapters/bcrypt.service';
+import { jwtService } from '../adapters/jwt.service';
 
 export const authService = {
-  async login(queryDto: AuthInputDto) {
-    const user = await this.checkCredentials(
-      queryDto.loginOrEmail,
-      queryDto.password,
+  async login(
+    loginOrEmail: string,
+    password: string,
+  ): Promise<Result<{ accessToken: string } | null>> {
+    const result = await this.checkCredentials(loginOrEmail, password);
+    if (result.status !== ResultStatus.Success) {
+      return {
+        status: ResultStatus.Unauthorized,
+        errorMessage: 'Unauthorized',
+        extensions: [{ field: 'loginOrEmail', message: 'Wrong credentials' }],
+        data: null,
+      };
+    }
+
+    const accessToken = await jwtService.createToken(
+      result.data!._id.toString(),
     );
 
-    if (!user) {
-      return null;
-    }
-
-    return user;
+    return {
+      status: ResultStatus.Success,
+      data: { accessToken },
+      extensions: [],
+    };
   },
 
-  async checkCredentials(loginOrEmail: string, password: string) {
-    const identifier = loginOrEmail.trim().toLowerCase();
-
-    const user = await usersRepository.findByEmailOrLogin(identifier);
-
+  async checkCredentials(
+    loginOrEmail: string,
+    password: string,
+  ): Promise<Result<UserDbModel | null>> {
+    const user = await usersRepository.findByEmailOrLogin(loginOrEmail);
     if (!user) {
-      return null;
+      return {
+        status: ResultStatus.NotFound,
+        data: null,
+        errorMessage: 'Not Found',
+        extensions: [{ field: 'loginOrEmail', message: 'Not Found' }],
+      };
     }
 
-    const ok = await bcryptService.checkPassword(password, user.passwordHash);
-    return ok ? user : null;
+    const isPassCorrect = await bcryptService.checkPassword(
+      password,
+      user.passwordHash,
+    );
+
+    if (!isPassCorrect) {
+      return {
+        status: ResultStatus.Unauthorized,
+        data: null,
+        errorMessage: 'Bad Request',
+        extensions: [{ field: 'password', message: 'Wrong password' }],
+      };
+    }
+
+    return {
+      status: ResultStatus.Success,
+      data: user,
+      extensions: [],
+    };
   },
 };

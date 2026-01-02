@@ -1,3 +1,15 @@
+export const routersPaths = {
+  common: '/',
+  users: '/users',
+  testing: '/testing',
+  posts: '/posts',
+  blogs: '/blogs',
+  auth: {
+    login: '/auth/login',
+    me: '/auth/me',
+  },
+};
+
 export const TESTING_PATH = '/testing';
 
 export const BLOGS_PATH = '/blogs';

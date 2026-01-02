@@ -12,6 +12,10 @@ import {
 } from '../validation/post.input-dto-validation-middlewares';
 import { paginationAndSortingValidation } from '../../core/middlewares/validation/query-pagination-sorting.validation-middleware';
 import { PostSortFields } from './input /post-sort-fields';
+import { getCommentListHandler } from '../../comments/routers/handlers/get-comment-list.handler';
+import { accessTokenGuard } from '../../auth/guards/access.token.guard';
+import { commentCreateInputValidation } from '../../comments/validation/comment.input-dto.validation-middlewares';
+import { createCommentHandler } from '../../comments/routers/handlers/create-comment.handler';
 
 export const postRouter = Router({});
 
@@ -32,4 +36,12 @@ postRouter
     inputValidationResultMiddleware,
     updatePostHandler,
   )
+  .post(
+    '/:id/comments',
+    accessTokenGuard,
+    commentCreateInputValidation,
+    inputValidationResultMiddleware,
+    createCommentHandler,
+  )
+  .get('/:id/comments', getCommentListHandler)
   .delete('/:id', superAdminGuardMiddleware, deletePostHandler);
