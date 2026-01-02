@@ -8,10 +8,7 @@ import { ResultStatus } from '../../core/result /resultCode';
 import { resultCodeToHttpException } from '../../core/result /resultCodeToHttpException';
 import { Request, Response } from 'express';
 import { HttpStatuses } from '../../core/types/http-statuses';
-import {
-  loginValidation,
-  passwordValidation,
-} from '../../users/validation/user.input-dto.validation-middlewares';
+import { passwordValidation } from '../../users/validation/user.input-dto.validation-middlewares';
 import { accessTokenGuard } from '../guards/access.token.guard';
 import { userService } from '../../users/application/user.service';
 
@@ -19,7 +16,6 @@ export const authRouter = Router({});
 
 authRouter.post(
   routersPaths.auth.login,
-  loginValidation,
   passwordValidation,
   inputValidationResultMiddleware,
   async (req: RequestWithBody<AuthInputDto>, res: Response) => {
