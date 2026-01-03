@@ -100,7 +100,10 @@ export const authService = {
       password,
     };
 
-    const createdUser = (await userService.createUser(newUser)) as UserDbModel;
+    const createdUser = (await userService.createUser(
+      newUser,
+      true,
+    )) as UserDbModel;
 
     try {
       await nodemailerService.sendEmail(
