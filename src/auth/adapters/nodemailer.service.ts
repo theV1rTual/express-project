@@ -1,5 +1,10 @@
 import nodemailer from 'nodemailer';
 import { SETTINGS } from '../../core/settings/settings';
+
+function normalizeAppPassword(s?: string) {
+  return (s ?? '').replace(/\s+/g, ''); // убираем пробелы из 16-значного app password
+}
+
 export const nodemailerService = {
   async sendEmail(
     email: string,
@@ -10,7 +15,7 @@ export const nodemailerService = {
       service: 'gmail',
       auth: {
         user: SETTINGS.EMAIL,
-        pass: SETTINGS.EMAIL_PASS,
+        pass: normalizeAppPassword(SETTINGS.EMAIL_PASS), // app password (16 chars)
       },
     });
 
