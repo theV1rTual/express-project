@@ -93,7 +93,11 @@ authRouter.post(
     const { login, email, password } = req.body;
     const result = await authService.registerUser(login, password, email);
     if (!result) {
-      return res.sendStatus(HttpStatuses.BAD_REQUEST);
+      return res
+        .status(HttpStatuses.BAD_REQUEST)
+        .send(
+          createErrorMessages([{ field: 'email', message: 'Email is wrong' }]),
+        );
     }
     if (result?.status === ResultStatus.Success) {
       return res.sendStatus(HttpStatuses.NO_CONTENT);
@@ -110,7 +114,11 @@ authRouter.post(
     const { email } = req.body;
     const result = await authService.resendEmail(email);
     if (!result) {
-      return res.status(HttpStatuses.BAD_REQUEST);
+      return res
+        .status(HttpStatuses.BAD_REQUEST)
+        .send(
+          createErrorMessages([{ field: 'email', message: 'Email is wrong' }]),
+        );
     }
     if (result?.status === ResultStatus.Success) {
       return res.sendStatus(HttpStatuses.NO_CONTENT);
