@@ -102,13 +102,17 @@ export const authService = {
 
     const createdUser = (await userService.createUser(newUser)) as UserDbModel;
 
-    nodemailerService
-      .sendEmail(
+    try {
+      await nodemailerService.sendEmail(
         createdUser.email,
-        createdUser.emailConfirmation.confirmationCode as string,
+        createdUser.emailConfirmation.confirmationCode!,
         emailExamples.registrationEmail,
-      )
-      .catch((er) => console.log('error in send email', er));
+      );
+    } catch (e) {
+      console.log('error in send email', e);
+      // чтобы тест не ждал письмо бесконечно
+      return { status: ResultStatus.BadRequest, data: null, extensions: [] };
+    }
 
     return {
       status: ResultStatus.Success,

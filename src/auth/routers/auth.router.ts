@@ -98,6 +98,7 @@ authRouter.post(
     if (result?.status === ResultStatus.Success) {
       return res.sendStatus(HttpStatuses.NO_CONTENT);
     }
+    return res.sendStatus(resultCodeToHttpException(result.status));
   },
 );
 
