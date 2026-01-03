@@ -8,10 +8,10 @@ import { ResultStatus } from '../../../core/result /resultCode';
 import { HttpStatuses } from '../../../core/types/http-statuses';
 
 export async function createCommentHandler(
-  req: Request<{ id: string }, {}, CommentInputDto>,
+  req: Request<{ postId: string }, {}, CommentInputDto>,
   res: Response,
 ) {
-  const postId = req.params.id;
+  const postId = req.params.postId;
   const post = await postsRepository.findById(postId);
   if (!post) {
     return {

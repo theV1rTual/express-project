@@ -38,7 +38,7 @@ postRouter
     updatePostHandler,
   )
   .post(
-    '/:id/comments',
+    '/:postId/comments',
     accessTokenGuard,
     commentCreateInputValidation,
     inputValidationResultMiddleware,
