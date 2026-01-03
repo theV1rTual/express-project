@@ -16,6 +16,7 @@ import { getCommentListHandler } from '../../comments/routers/handlers/get-comme
 import { accessTokenGuard } from '../../auth/guards/access.token.guard';
 import { commentCreateInputValidation } from '../../comments/validation/comment.input-dto.validation-middlewares';
 import { createCommentHandler } from '../../comments/routers/handlers/create-comment.handler';
+import { CommentSortField } from '../../comments/routers/input/comment-sort-field';
 
 export const postRouter = Router({});
 
@@ -43,5 +44,9 @@ postRouter
     inputValidationResultMiddleware,
     createCommentHandler,
   )
-  .get('/:id/comments', getCommentListHandler)
+  .get(
+    '/:id/comments',
+    paginationAndSortingValidation(CommentSortField),
+    getCommentListHandler,
+  )
   .delete('/:id', superAdminGuardMiddleware, deletePostHandler);
