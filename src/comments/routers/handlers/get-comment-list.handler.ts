@@ -10,7 +10,7 @@ import { HttpStatuses } from '../../../core/types/http-statuses';
 
 export async function getCommentListHandler(req: Request, res: Response) {
   try {
-    const postId = req.params.id;
+    const postId = req.params.postId;
     const post = await postsRepository.findById(postId);
     if (!post) {
       return res.sendStatus(HttpStatuses.NOT_FOUND);

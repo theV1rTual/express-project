@@ -45,7 +45,7 @@ postRouter
     createCommentHandler,
   )
   .get(
-    '/:id/comments',
+    '/:postId/comments',
     paginationAndSortingValidation(CommentSortField),
     getCommentListHandler,
   )
