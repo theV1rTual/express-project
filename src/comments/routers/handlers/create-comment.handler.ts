@@ -4,7 +4,6 @@ import { CommentViewModel } from '../../types/CommentViewModel';
 import { commentRepository } from '../../repository/comment.repository';
 import { usersRepository } from '../../../users/repositories/users.repository';
 import { postsRepository } from '../../../posts/repositories/posts.repository';
-import { ResultStatus } from '../../../core/result /resultCode';
 import { HttpStatuses } from '../../../core/types/http-statuses';
 
 export async function createCommentHandler(
@@ -14,22 +13,12 @@ export async function createCommentHandler(
   const postId = req.params.postId;
   const post = await postsRepository.findById(postId);
   if (!post) {
-    return {
-      status: ResultStatus.NotFound,
-      errorMessage: 'Post not found',
-      extensions: [{ field: 'postId', message: 'Post not found' }],
-      data: null,
-    };
+    return res.sendStatus(HttpStatuses.NOT_FOUND);
   }
 
   const userLogin = await usersRepository.findById(req.user?.id as string);
   if (!userLogin) {
-    return {
-      status: ResultStatus.NotFound,
-      errorMessage: 'user not found',
-      extensions: [{ field: 'userId', message: 'User not found' }],
-      data: null,
-    };
+    return res.sendStatus(HttpStatuses.NOT_FOUND);
   }
 
   const newComment: CommentInputDto = {
