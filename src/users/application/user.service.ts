@@ -16,7 +16,7 @@ export const userService = {
     return usersRepository.findById(id);
   },
 
-  async createUser(user: UserInputDto) {
+  async createUser(user: UserInputDto, registration?: boolean) {
     const login = user.login.trim();
     const email = user.email.trim();
 
@@ -29,6 +29,6 @@ export const userService = {
       return { field: 'email', message: 'email should be unique' };
 
     const passwordHash = await bcryptService.generateHash(user.password);
-    return await usersRepository.createUser(user, passwordHash);
+    return await usersRepository.createUser(user, passwordHash, registration);
   },
 };

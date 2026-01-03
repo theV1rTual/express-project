@@ -5,6 +5,8 @@ import { ObjectId } from 'mongodb';
 import { UserViewModel } from '../types/UserViewModel';
 import { mapUserDbToUserView } from '../routers/mappers/mapUserDbToUserView';
 import { UserInputDto } from '../dto/user.input-dto';
+import { add } from 'date-fns/add';
+import { randomUUID } from 'crypto';
 
 export const usersRepository = {
   async findAll(
@@ -73,18 +75,62 @@ export const usersRepository = {
     });
   },
 
+  async doesExistByLoginOrEmail(login: string, email: string) {
+    return usersCollection.findOne({
+      $or: [{ login: login }, { email: email }],
+    });
+  },
+
+  async findByCode(code: string) {
+    return usersCollection.findOne({ code });
+  },
+
+  async confirmRegistration(code: string) {
+    const user = await this.findByCode(code);
+
+    if (!user) {
+      return null;
+    }
+
+    const result = await usersCollection.updateOne(
+      {
+        _id: user._id,
+      },
+      {
+        $set: {
+          'emailConfirmation.isConfirmed': true,
+        },
+      },
+    );
+
+    return result.matchedCount === 1;
+  },
+
   async createUser(
     user: UserInputDto,
     passwordHash: string,
-  ): Promise<UserViewModel | null> {
+    registration?: boolean,
+  ): Promise<UserViewModel | null | UserDbModel> {
     const docToInsert: UserDbModel = {
       _id: new ObjectId(),
       createdAt: new Date(),
       login: user.login,
       email: user.email,
       passwordHash,
+      emailConfirmation: {
+        confirmationCode: randomUUID(),
+        expirationDate: add(new Date(), {
+          hours: 1,
+          minutes: 30,
+        }),
+        isConfirmed: false,
+      },
     };
     await usersCollection.insertOne(docToInsert);
+
+    if (registration) {
+      return docToInsert;
+    }
 
     return mapUserDbToUserView(docToInsert);
   },

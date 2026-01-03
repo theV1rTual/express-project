@@ -6,4 +6,9 @@ export type UserDbModel = {
   email: string;
   createdAt: Date;
   passwordHash: string;
+  emailConfirmation: {
+    confirmationCode: string | null;
+    expirationDate: Date | null;
+    isConfirmed: boolean;
+  };
 };
