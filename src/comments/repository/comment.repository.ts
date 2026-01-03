@@ -23,7 +23,7 @@ export const commentRepository = {
       .limit(pageSize)
       .toArray();
 
-    const totalCount = await commentsCollection.countDocuments();
+    const totalCount = await commentsCollection.countDocuments({ postId });
 
     return { items, totalCount };
   },
