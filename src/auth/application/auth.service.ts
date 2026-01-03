@@ -91,8 +91,25 @@ export const authService = {
   },
 
   async registerUser(login: string, password: string, email: string) {
-    const user = await usersRepository.doesExistByLoginOrEmail(login, email);
-    if (user) return null;
+    const loginExists = await usersRepository.findByLogin(login);
+    const emailExists = await usersRepository.findByEmail(email);
+    if (loginExists) {
+      return {
+        status: ResultStatus.BadRequest,
+        errorMessage: 'Login exists',
+        extensions: [{ field: 'login', message: 'Login exists' }],
+        data: null,
+      };
+    }
+
+    if (emailExists) {
+      return {
+        status: ResultStatus.BadRequest,
+        errorMessage: 'Email exists',
+        extensions: [{ field: 'email', message: 'Email exists' }],
+        data: null,
+      };
+    }
 
     const newUser: UserInputDto = {
       login,

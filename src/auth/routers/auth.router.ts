@@ -92,12 +92,13 @@ authRouter.post(
   async (req: Request, res: Response) => {
     const { login, email, password } = req.body;
     const result = await authService.registerUser(login, password, email);
-    if (!result) {
-      return res
-        .status(HttpStatuses.BAD_REQUEST)
-        .send(
-          createErrorMessages([{ field: 'email', message: 'Email is wrong' }]),
-        );
+    if (result.status === ResultStatus.BadRequest) {
+      return res.status(HttpStatuses.BAD_REQUEST).send({
+        errorsMessages: result.extensions.map((e) => ({
+          field: e.field,
+          message: e.message,
+        })),
+      });
     }
     if (result?.status === ResultStatus.Success) {
       return res.sendStatus(HttpStatuses.NO_CONTENT);
