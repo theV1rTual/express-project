@@ -5,10 +5,16 @@ import { setDefaultSortAndPagination } from '../../../core/helpers/set-default-s
 import { CommentsService } from '../../application/comments.service';
 import { errorsHandler } from '../../../core/errors/errors.handler';
 import { mapToCommentListPaginatedOutput } from '../mappers/mapToCommentListPaginatedOutput.utils';
+import { postsRepository } from '../../../posts/repositories/posts.repository';
+import { HttpStatuses } from '../../../core/types/http-statuses';
 
 export async function getCommentListHandler(req: Request, res: Response) {
   try {
     const postId = req.params.id;
+    const post = await postsRepository.findById(postId);
+    if (!post) {
+      return res.sendStatus(HttpStatuses.NOT_FOUND);
+    }
     const sanitizedQuery = matchedData<CommentQueryInput>(req, {
       locations: ['query'],
       includeOptionals: true,
