@@ -139,7 +139,7 @@ export const usersRepository = {
     id: ObjectId,
     payload: UserDbModel['emailConfirmation'],
   ) {
-    await usersCollection.updateOne(
+    const result = await usersCollection.updateOne(
       {
         _id: new ObjectId(id),
       },
@@ -147,6 +147,7 @@ export const usersRepository = {
         $set: { emailConfirmation: payload },
       },
     );
+    return result.matchedCount === 1;
   },
 
   async delete(id: string): Promise<boolean> {

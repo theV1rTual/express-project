@@ -74,11 +74,20 @@ export const authService = {
 
   async resendEmail(email: string) {
     const user = await usersRepository.findByEmail(email);
-    if (!user || user.emailConfirmation.isConfirmed) {
+    if (!user) {
       return {
         status: ResultStatus.NotFound,
         data: null,
         extensions: [],
+      };
+    }
+
+    if (user.emailConfirmation.isConfirmed) {
+      return {
+        status: ResultStatus.BadRequest,
+        errorMessage: 'Email already confirmed',
+        extensions: [{ field: 'email', message: 'Email already confirmed' }],
+        data: null,
       };
     }
 
@@ -91,16 +100,29 @@ export const authService = {
       }),
     };
 
-    await usersRepository.setConfirmation(user._id, newEmailConfirmation);
+    const updated = await usersRepository.setConfirmation(
+      user._id,
+      newEmailConfirmation,
+    );
+    if (!updated) {
+      return {
+        status: ResultStatus.BadRequest,
+        errorMessage: 'Email already confirmed',
+        extensions: [{ field: 'email', message: 'Email already confirmed' }],
+        data: null,
+      };
+    }
 
-    nodemailerService
-      .sendEmail(
+    try {
+      await nodemailerService.sendEmail(
         email,
         newEmailConfirmation.confirmationCode as string,
         emailExamples.registrationEmail,
-      )
-      .catch((er) => console.log('error in send email', er));
-
+      );
+    } catch (e) {
+      console.log('error in send email', e);
+      return { status: ResultStatus.BadRequest, data: null, extensions: [] };
+    }
     return {
       status: ResultStatus.Success,
       extensions: [],
