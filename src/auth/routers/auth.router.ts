@@ -119,7 +119,16 @@ authRouter.post(
       return res
         .sendStatus(resultCodeToHttpException(result.status))
         .send(
-          createErrorMessages([{ field: 'email', message: 'Email is wrong' }]),
+          createErrorMessages([{ field: 'email', message: 'Email not found' }]),
+        );
+    }
+    if (result.status === ResultStatus.BadRequest) {
+      return res
+        .sendStatus(resultCodeToHttpException(result.status))
+        .send(
+          createErrorMessages([
+            { field: 'email', message: 'Email is already confirmed' },
+          ]),
         );
     }
     if (result?.status === ResultStatus.Success) {
