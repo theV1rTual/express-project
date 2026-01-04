@@ -117,14 +117,14 @@ authRouter.post(
     const result = await authService.resendEmail(email);
     if (result.status === ResultStatus.NotFound) {
       return res
-        .sendStatus(resultCodeToHttpException(result.status))
+        .status(resultCodeToHttpException(result.status))
         .send(
           createErrorMessages([{ field: 'email', message: 'Email not found' }]),
         );
     }
     if (result.status === ResultStatus.BadRequest) {
       return res
-        .sendStatus(resultCodeToHttpException(result.status))
+        .status(resultCodeToHttpException(result.status))
         .send(
           createErrorMessages([
             { field: 'email', message: 'Email is already confirmed' },
