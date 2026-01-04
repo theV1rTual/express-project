@@ -70,7 +70,7 @@ authRouter.post(
     }
 
     let result = await usersRepository.confirmRegistration(req.body.code);
-    if (!result) {
+    if (result.status === ResultStatus.BadRequest) {
       res
         .status(HttpStatuses.BAD_REQUEST)
         .send(
@@ -78,8 +78,10 @@ authRouter.post(
         );
       return;
     }
-
-    return res.sendStatus(HttpStatuses.NO_CONTENT);
+    if (result.status === ResultStatus.Success) {
+      return res.sendStatus(resultCodeToHttpException(result.status));
+    }
+    return res.sendStatus(HttpStatuses.INTERNAL_SERVER_ERROR);
   },
 );
 

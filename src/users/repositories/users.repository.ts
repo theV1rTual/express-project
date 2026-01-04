@@ -8,6 +8,7 @@ import { UserInputDto } from '../dto/user.input-dto';
 import { add } from 'date-fns/add';
 import { randomUUID } from 'crypto';
 import { ResultStatus } from '../../core/result /resultCode';
+import { Result } from '../../core/result /result.type';
 
 export const usersRepository = {
   async findAll(
@@ -88,11 +89,15 @@ export const usersRepository = {
     });
   },
 
-  async confirmRegistration(code: string) {
+  async confirmRegistration(code: string): Promise<Result<UserDbModel[]>> {
     const user = await this.findByCode(code);
 
     if (!user) {
-      return null;
+      return {
+        status: ResultStatus.BadRequest,
+        data: [],
+        extensions: [{ field: 'code', message: 'Code not found' }],
+      };
     }
 
     if (user.emailConfirmation.isConfirmed) {
@@ -114,7 +119,19 @@ export const usersRepository = {
       },
     );
 
-    return result.matchedCount === 1;
+    if (result.matchedCount === 1) {
+      return {
+        status: ResultStatus.Success,
+        data: [],
+        extensions: [],
+      };
+    }
+
+    return {
+      status: ResultStatus.BadRequest,
+      data: [],
+      extensions: [],
+    };
   },
 
   async createUser(
