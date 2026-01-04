@@ -79,7 +79,7 @@ authRouter.post(
       return;
     }
     if (result.status === ResultStatus.Success) {
-      return res.sendStatus(resultCodeToHttpException(result.status));
+      return res.sendStatus(HttpStatuses.NO_CONTENT);
     }
   },
 );
