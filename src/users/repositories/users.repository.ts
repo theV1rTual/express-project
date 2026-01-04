@@ -89,13 +89,13 @@ export const usersRepository = {
     });
   },
 
-  async confirmRegistration(code: string): Promise<Result<UserDbModel[]>> {
+  async confirmRegistration(code: string): Promise<Result<null>> {
     const user = await this.findByCode(code);
 
     if (!user) {
       return {
         status: ResultStatus.BadRequest,
-        data: [],
+        data: null,
         extensions: [{ field: 'code', message: 'Code not found' }],
       };
     }
@@ -103,7 +103,7 @@ export const usersRepository = {
     if (user.emailConfirmation.isConfirmed) {
       return {
         status: ResultStatus.BadRequest,
-        data: [],
+        data: null,
         extensions: [{ field: 'code', message: 'Code is already confirmed' }],
       };
     }
@@ -122,14 +122,14 @@ export const usersRepository = {
     if (result.matchedCount === 1) {
       return {
         status: ResultStatus.Success,
-        data: [],
+        data: null,
         extensions: [],
       };
     }
 
     return {
       status: ResultStatus.BadRequest,
-      data: [],
+      data: null,
       extensions: [],
     };
   },
