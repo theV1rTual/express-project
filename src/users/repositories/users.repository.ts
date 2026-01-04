@@ -82,7 +82,9 @@ export const usersRepository = {
   },
 
   async findByCode(code: string) {
-    return usersCollection.findOne({ code });
+    return usersCollection.findOne({
+      'emailConfirmation.confirmationCode': code,
+    });
   },
 
   async confirmRegistration(code: string) {
