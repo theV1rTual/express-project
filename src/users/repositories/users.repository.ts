@@ -135,6 +135,20 @@ export const usersRepository = {
     return mapUserDbToUserView(docToInsert);
   },
 
+  async setConfirmation(
+    id: ObjectId,
+    payload: UserDbModel['emailConfirmation'],
+  ) {
+    await usersCollection.updateOne(
+      {
+        _id: new ObjectId(id),
+      },
+      {
+        $set: { emailConfirmation: payload },
+      },
+    );
+  },
+
   async delete(id: string): Promise<boolean> {
     const deletedResult = await usersCollection.deleteOne({
       _id: new ObjectId(id),

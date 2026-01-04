@@ -114,9 +114,9 @@ authRouter.post(
   async (req: Request, res: Response) => {
     const { email } = req.body;
     const result = await authService.resendEmail(email);
-    if (!result) {
+    if (result.status === ResultStatus.NotFound) {
       return res
-        .status(HttpStatuses.BAD_REQUEST)
+        .sendStatus(resultCodeToHttpException(result.status))
         .send(
           createErrorMessages([{ field: 'email', message: 'Email is wrong' }]),
         );

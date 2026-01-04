@@ -8,6 +8,8 @@ import { UserInputDto } from '../../users/dto/user.input-dto';
 import { userService } from '../../users/application/user.service';
 import { nodemailerService } from '../adapters/nodemailer.service';
 import { emailExamples } from '../adapters/emailExamples';
+import { randomUUID } from 'crypto';
+import { add } from 'date-fns/add';
 
 export const authService = {
   async login(
@@ -73,13 +75,28 @@ export const authService = {
   async resendEmail(email: string) {
     const user = await usersRepository.findByEmail(email);
     if (!user || user.emailConfirmation.isConfirmed) {
-      return null;
+      return {
+        status: ResultStatus.NotFound,
+        data: null,
+        extensions: [],
+      };
     }
+
+    const newEmailConfirmation: UserDbModel['emailConfirmation'] = {
+      isConfirmed: false,
+      confirmationCode: randomUUID(),
+      expirationDate: add(new Date(), {
+        hours: 1,
+        minutes: 30,
+      }),
+    };
+
+    await usersRepository.setConfirmation(user._id, newEmailConfirmation);
 
     nodemailerService
       .sendEmail(
         email,
-        user.emailConfirmation.confirmationCode as string,
+        newEmailConfirmation.confirmationCode as string,
         emailExamples.registrationEmail,
       )
       .catch((er) => console.log('error in send email', er));
