@@ -76,7 +76,7 @@ export const authService = {
     const user = await usersRepository.findByEmail(email);
     if (!user) {
       return {
-        status: ResultStatus.NotFound,
+        status: ResultStatus.BadRequest,
         data: null,
         extensions: [],
       };
