@@ -7,6 +7,7 @@ import { mapUserDbToUserView } from '../routers/mappers/mapUserDbToUserView';
 import { UserInputDto } from '../dto/user.input-dto';
 import { add } from 'date-fns/add';
 import { randomUUID } from 'crypto';
+import { ResultStatus } from '../../core/result /resultCode';
 
 export const usersRepository = {
   async findAll(
@@ -92,6 +93,14 @@ export const usersRepository = {
 
     if (!user) {
       return null;
+    }
+
+    if (user.emailConfirmation.isConfirmed) {
+      return {
+        status: ResultStatus.BadRequest,
+        data: [],
+        extensions: [{ field: 'code', message: 'Code is already confirmed' }],
+      };
     }
 
     const result = await usersCollection.updateOne(
