@@ -26,11 +26,11 @@ export const authService = {
       };
     }
 
-    const accessToken = await jwtService.createToken(
+    const accessToken = await jwtService.createAccessToken(
       result.data!._id.toString(),
     );
 
-    const refreshToken = await jwtService.createToken(
+    const refreshToken = await jwtService.createRefreshToken(
       result.data!._id.toString(),
     );
 

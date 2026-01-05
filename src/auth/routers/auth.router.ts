@@ -76,9 +76,11 @@ authRouter.post(
       userId: new ObjectId(req.user?.id),
     });
 
-    const accessToken = await jwtService.createToken(req.user?.id as string);
+    const accessToken = await jwtService.createAccessToken(
+      req.user?.id as string,
+    );
 
-    const newRefreshToken = await jwtService.createToken(
+    const newRefreshToken = await jwtService.createRefreshToken(
       req.user?.id as string,
     );
 
