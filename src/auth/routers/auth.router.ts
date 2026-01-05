@@ -74,7 +74,7 @@ authRouter.post(
       return res.sendStatus(HttpStatuses.UNAUTHORIZED);
     }
 
-    const payload = await jwtService.verifyToken(refreshToken);
+    const payload = await jwtService.verifyRefreshToken(refreshToken);
 
     if (!payload) {
       return res.sendStatus(HttpStatuses.UNAUTHORIZED);

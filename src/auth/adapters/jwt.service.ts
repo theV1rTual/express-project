@@ -22,4 +22,13 @@ export const jwtService = {
       return null;
     }
   },
+
+  async verifyRefreshToken(token: string): Promise<{ userId: string } | null> {
+    try {
+      return jwt.verify(token, SETTINGS.RF_SECRET) as { userId: string };
+    } catch (e) {
+      console.log('Token verification failed');
+      return null;
+    }
+  },
 };
