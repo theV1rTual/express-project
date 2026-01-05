@@ -62,22 +62,29 @@ authRouter.post(
   async (req: Request, res: Response) => {
     const refreshToken = req.cookies.refreshToken;
 
-    // we need to check if refreshToken is valid
-
-    const oldRefreshToken = await refreshTokensCollection.findOne({
-      value: refreshToken,
-    });
-
-    if (
-      (await jwtService.verifyToken(oldRefreshToken?.value as string)) &&
-      !oldRefreshToken?.isValid
-    ) {
+    if (!refreshToken) {
       return res.sendStatus(HttpStatuses.UNAUTHORIZED);
     }
 
-    await refreshTokensCollection.deleteOne({
-      userId: new ObjectId(req.user?.id),
+    const tokenDoc = await refreshTokensCollection.findOne({
+      value: refreshToken,
     });
+
+    if (!tokenDoc || !tokenDoc.isValid) {
+      return res.sendStatus(HttpStatuses.UNAUTHORIZED);
+    }
+
+    const userId = tokenDoc.userId.toString();
+
+    await refreshTokensCollection.updateOne(
+      { _id: tokenDoc._id },
+      { $set: { isValid: false } },
+    );
+    const payload = await jwtService.verifyToken(refreshToken);
+
+    if (!payload) {
+      return res.sendStatus(HttpStatuses.UNAUTHORIZED);
+    }
 
     const accessToken = await jwtService.createAccessToken(
       req.user?.id as string,
@@ -90,8 +97,13 @@ authRouter.post(
     await refreshTokensCollection.insertOne({
       _id: new ObjectId(),
       value: newRefreshToken as string,
-      userId: new ObjectId(req.user?.id),
+      userId: new ObjectId(userId),
       isValid: true,
+    });
+
+    res.cookie('refreshToken', newRefreshToken, {
+      httpOnly: true,
+      secure: true,
     });
 
     return res.status(HttpStatuses.OK).send({ accessToken });
