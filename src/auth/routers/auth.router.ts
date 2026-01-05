@@ -68,7 +68,10 @@ authRouter.post(
       value: refreshToken,
     });
 
-    if (!oldRefreshToken?.isValid) {
+    if (
+      (await jwtService.verifyToken(oldRefreshToken?.value as string)) &&
+      !oldRefreshToken?.isValid
+    ) {
       return res.sendStatus(HttpStatuses.UNAUTHORIZED);
     }
 
@@ -122,7 +125,7 @@ authRouter.get(
       return res.sendStatus(HttpStatuses.UNAUTHORIZED);
     }
 
-    const me = await userService.findById(userId);
+    const me = await userService.findById(userId, true);
 
     return res.status(HttpStatuses.OK).send(me);
   },

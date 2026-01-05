@@ -4,6 +4,7 @@ import { usersRepository } from '../repositories/users.repository';
 import { UserInputDto } from '../dto/user.input-dto';
 import { bcryptService } from '../../auth/adapters/bcrypt.service';
 import { UserViewModel } from '../types/UserViewModel';
+import { UserMeModel } from '../types/UserMeModel';
 
 export const userService = {
   async findMany(
@@ -12,8 +13,11 @@ export const userService = {
     return usersRepository.findAll(queryDto);
   },
 
-  async findById(id: string): Promise<UserViewModel | null> {
-    return usersRepository.findById(id);
+  async findById(
+    id: string,
+    me?: boolean,
+  ): Promise<UserViewModel | UserMeModel | null> {
+    return usersRepository.findById(id, me);
   },
 
   async createUser(user: UserInputDto, registration?: boolean) {

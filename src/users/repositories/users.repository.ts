@@ -9,6 +9,8 @@ import { add } from 'date-fns/add';
 import { randomUUID } from 'crypto';
 import { ResultStatus } from '../../core/result /resultCode';
 import { Result } from '../../core/result /result.type';
+import { mapUserDbToMeRequest } from '../routers/mappers/mapUserDbToMeRequest';
+import { UserMeModel } from '../types/UserMeModel';
 
 export const usersRepository = {
   async findAll(
@@ -52,12 +54,19 @@ export const usersRepository = {
     return { items, totalCount };
   },
 
-  async findById(id: string): Promise<UserViewModel | null> {
+  async findById(
+    id: string,
+    meRequest?: boolean,
+  ): Promise<UserViewModel | UserMeModel | null> {
     const userDb = await usersCollection.findOne({
       _id: new ObjectId(id),
     });
     if (!userDb) {
       return null;
+    }
+
+    if (meRequest) {
+      return mapUserDbToMeRequest(userDb);
     }
 
     return mapUserDbToUserView(userDb);
