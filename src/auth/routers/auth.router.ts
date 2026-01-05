@@ -129,7 +129,7 @@ authRouter.get(
 
     const me = await usersRepository.findById(userId, true);
 
-    return res.status(HttpStatuses.OK).send({ me });
+    return res.status(HttpStatuses.OK).send(me);
   },
 );
 
