@@ -74,25 +74,22 @@ authRouter.post(
       return res.sendStatus(HttpStatuses.UNAUTHORIZED);
     }
 
-    const userId = tokenDoc.userId.toString();
-
-    await refreshTokensCollection.updateOne(
-      { _id: tokenDoc._id },
-      { $set: { isValid: false } },
-    );
     const payload = await jwtService.verifyToken(refreshToken);
 
     if (!payload) {
       return res.sendStatus(HttpStatuses.UNAUTHORIZED);
     }
 
-    const accessToken = await jwtService.createAccessToken(
-      req.user?.id as string,
+    const userId = tokenDoc.userId.toString();
+
+    await refreshTokensCollection.updateOne(
+      { _id: tokenDoc._id },
+      { $set: { isValid: false } },
     );
 
-    const newRefreshToken = await jwtService.createRefreshToken(
-      req.user?.id as string,
-    );
+    const accessToken = await jwtService.createAccessToken(userId);
+
+    const newRefreshToken = await jwtService.createRefreshToken(userId);
 
     await refreshTokensCollection.insertOne({
       _id: new ObjectId(),
