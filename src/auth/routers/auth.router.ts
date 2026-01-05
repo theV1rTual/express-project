@@ -129,13 +129,9 @@ authRouter.get(
   async (req: Request, res: Response) => {
     const userId = req.user?.id as string;
 
-    if (!userId) {
-      return res.sendStatus(HttpStatuses.UNAUTHORIZED);
-    }
-
     const me = await usersRepository.findById(userId, true);
 
-    return res.status(HttpStatuses.OK).send(me);
+    return res.status(HttpStatuses.OK).send({ me });
   },
 );
 
