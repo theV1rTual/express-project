@@ -13,7 +13,6 @@ import {
   passwordValidation,
 } from '../../users/validation/user.input-dto.validation-middlewares';
 import { accessTokenGuard } from '../guards/access.token.guard';
-import { userService } from '../../users/application/user.service';
 import { usersRepository } from '../../users/repositories/users.repository';
 import { createErrorMessages } from '../../core/utils/error.utils';
 import { jwtService } from '../adapters/jwt.service';
@@ -134,7 +133,7 @@ authRouter.get(
       return res.sendStatus(HttpStatuses.UNAUTHORIZED);
     }
 
-    const me = await userService.findById(userId, true);
+    const me = await usersRepository.findById(userId, true);
 
     return res.status(HttpStatuses.OK).send(me);
   },
