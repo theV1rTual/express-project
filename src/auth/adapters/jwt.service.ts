@@ -9,7 +9,7 @@ export const jwtService = {
   },
 
   async createRefreshToken(userId: string): Promise<string> {
-    return jwt.sign({ userId }, SETTINGS.AC_SECRET, {
+    return jwt.sign({ userId }, SETTINGS.RF_SECRET, {
       expiresIn: SETTINGS.RF_TIME,
     });
   },

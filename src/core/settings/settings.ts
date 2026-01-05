@@ -10,6 +10,8 @@ export const SETTINGS = {
   RF_TIME: 20,
   AC_SECRET:
     'efcf780e4db6d154732e9964447798ea0d6e381fbba8f6db742c034eb917417cd067c1f87df0a2d86a0fbe4dc649c47dfcdc151b148ab80c9559ee15feb442f4',
+  RF_SECRET:
+    'efcf780e4db6d154732e9964447798ea0d6e381fbba8f6db742c034eb917417cd0b7c1f8df0a2d86a0fbe4d649c47dfcdc151b148ab80142f559ee15feb44144',
   EMAIL: 'arystandev@gmail.com',
   EMAIL_PASS: 'mskq xfnt edyu mrzr',
 };
