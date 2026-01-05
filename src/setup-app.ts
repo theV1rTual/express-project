@@ -6,6 +6,7 @@ import { postRouter } from './posts/routers/post.router';
 import { usersRouter } from './users/routers/users.router';
 import { authRouter } from './auth/routers/auth.router';
 import { commentsRouter } from './comments/routers/comments.router';
+import cookieParser from 'cookie-parser';
 
 export const setupApp = (app: Express) => {
   app.use(express.json());
@@ -13,6 +14,9 @@ export const setupApp = (app: Express) => {
   app.get('/', (req, res) => {
     res.status(200).send('Server is alive');
   });
+
+  app.use(cookieParser());
+
   app.use(routersPaths.testing, testingRouter);
   app.use(routersPaths.posts, postRouter);
   app.use(routersPaths.blogs, blogsRouter);

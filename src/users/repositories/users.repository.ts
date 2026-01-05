@@ -153,6 +153,7 @@ export const usersRepository = {
         }),
         isConfirmed: false,
       },
+      refreshToken: null,
     };
     await usersCollection.insertOne(docToInsert);
 

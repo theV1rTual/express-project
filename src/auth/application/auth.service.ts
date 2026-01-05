@@ -15,7 +15,7 @@ export const authService = {
   async login(
     loginOrEmail: string,
     password: string,
-  ): Promise<Result<{ accessToken: string } | null>> {
+  ): Promise<Result<{ accessToken: string; refreshToken: string } | null>> {
     const result = await this.checkCredentials(loginOrEmail, password);
     if (result.status !== ResultStatus.Success) {
       return {
@@ -30,9 +30,13 @@ export const authService = {
       result.data!._id.toString(),
     );
 
+    const refreshToken = await jwtService.createToken(
+      result.data!._id.toString(),
+    );
+
     return {
       status: ResultStatus.Success,
-      data: { accessToken },
+      data: { accessToken, refreshToken },
       extensions: [],
     };
   },

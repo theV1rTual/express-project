@@ -11,6 +11,8 @@ export const routersPaths = {
     registrationConfirmation: '/auth/registration-confirmation',
     registration: '/auth/registration',
     registrationEmailResending: '/auth/registration-email-resending',
+    refreshToken: '/auth/refresh-token',
+    logout: '/auth/logout',
   },
 };
 

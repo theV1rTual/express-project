@@ -16,6 +16,9 @@ import { accessTokenGuard } from '../guards/access.token.guard';
 import { userService } from '../../users/application/user.service';
 import { usersRepository } from '../../users/repositories/users.repository';
 import { createErrorMessages } from '../../core/utils/error.utils';
+import { jwtService } from '../adapters/jwt.service';
+import { ObjectId } from 'mongodb';
+import { refreshTokensCollection } from '../../db/mongo.db';
 
 export const authRouter = Router({});
 
@@ -34,9 +37,76 @@ authRouter.post(
         .send(result.extensions);
     }
 
+    const refreshToken = result.data?.refreshToken;
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: true,
+    });
+
+    await refreshTokensCollection.insertOne({
+      _id: new ObjectId(),
+      value: refreshToken as string,
+      userId: new ObjectId(req.user?.id),
+      isValid: false,
+    });
+
     return res
       .status(HttpStatuses.OK)
       .send({ accessToken: result.data?.accessToken });
+  },
+);
+
+authRouter.post(
+  routersPaths.auth.refreshToken,
+  async (req: Request, res: Response) => {
+    const refreshToken = req.cookies.refreshToken;
+
+    // we need to check if refreshToken is valid
+
+    const oldRefreshToken = await refreshTokensCollection.findOne({
+      value: refreshToken,
+    });
+
+    if (!oldRefreshToken?.isValid) {
+      return res.sendStatus(HttpStatuses.UNAUTHORIZED);
+    }
+
+    await refreshTokensCollection.deleteOne({
+      userId: new ObjectId(req.user?.id),
+    });
+
+    const accessToken = await jwtService.createToken(req.user?.id as string);
+
+    const newRefreshToken = await jwtService.createToken(
+      req.user?.id as string,
+    );
+
+    await refreshTokensCollection.insertOne({
+      _id: new ObjectId(),
+      value: newRefreshToken as string,
+      userId: new ObjectId(req.user?.id),
+      isValid: true,
+    });
+
+    return res.status(HttpStatuses.OK).send({ accessToken });
+  },
+);
+
+authRouter.post(
+  routersPaths.auth.logout,
+  accessTokenGuard,
+  inputValidationResultMiddleware,
+  async (req: Request, res: Response) => {
+    let result = await refreshTokensCollection.deleteOne({
+      userId: new ObjectId(req.user?.id),
+    });
+
+    if (result.deletedCount === 1) {
+      res.sendStatus(HttpStatuses.NO_CONTENT);
+    }
+
+    res.sendStatus(HttpStatuses.INTERNAL_SERVER_ERROR);
   },
 );
 

@@ -11,4 +11,5 @@ export type UserDbModel = {
     expirationDate: Date | null;
     isConfirmed: boolean;
   };
+  refreshToken: string | null;
 };
