@@ -10,12 +10,19 @@ import { nodemailerService } from '../adapters/nodemailer.service';
 import { emailExamples } from '../adapters/emailExamples';
 import { randomUUID } from 'crypto';
 import { add } from 'date-fns/add';
+import { ObjectId } from 'mongodb';
 
 export const authService = {
   async login(
     loginOrEmail: string,
     password: string,
-  ): Promise<Result<{ accessToken: string; refreshToken: string } | null>> {
+  ): Promise<
+    Result<{
+      accessToken: string;
+      refreshToken: string;
+      userId: ObjectId;
+    } | null>
+  > {
     const result = await this.checkCredentials(loginOrEmail, password);
     if (result.status !== ResultStatus.Success) {
       return {
@@ -36,7 +43,7 @@ export const authService = {
 
     return {
       status: ResultStatus.Success,
-      data: { accessToken, refreshToken },
+      data: { accessToken, refreshToken, userId: result.data?._id as ObjectId },
       extensions: [],
     };
   },

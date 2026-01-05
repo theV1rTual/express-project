@@ -36,7 +36,7 @@ authRouter.post(
         .send(result.extensions);
     }
 
-    const refreshToken = result.data?.refreshToken;
+    const { refreshToken, accessToken, userId } = result.data!;
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
@@ -46,13 +46,11 @@ authRouter.post(
     await refreshTokensCollection.insertOne({
       _id: new ObjectId(),
       value: refreshToken as string,
-      userId: new ObjectId(req.user?.id),
+      userId: userId,
       isValid: true,
     });
 
-    return res
-      .status(HttpStatuses.OK)
-      .send({ accessToken: result.data?.accessToken });
+    return res.status(HttpStatuses.OK).send({ accessToken });
   },
 );
 
