@@ -48,7 +48,7 @@ authRouter.post(
       _id: new ObjectId(),
       value: refreshToken as string,
       userId: new ObjectId(req.user?.id),
-      isValid: false,
+      isValid: true,
     });
 
     return res
