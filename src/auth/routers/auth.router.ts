@@ -106,9 +106,11 @@ authRouter.post(
 
 authRouter.post(
   routersPaths.auth.logout,
-  accessTokenGuard,
-  inputValidationResultMiddleware,
   async (req: Request, res: Response) => {
+    let refreshToken = req.cookies.refreshToken;
+    if (!(await jwtService.verifyRefreshToken(refreshToken))) {
+      return res.sendStatus(HttpStatuses.UNAUTHORIZED);
+    }
     let result = await refreshTokensCollection.deleteOne({
       userId: new ObjectId(req.user?.id),
     });
