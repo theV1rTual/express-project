@@ -108,18 +108,30 @@ authRouter.post(
   routersPaths.auth.logout,
   async (req: Request, res: Response) => {
     let refreshToken = req.cookies.refreshToken;
-    if (!(await jwtService.verifyRefreshToken(refreshToken))) {
+    if (!refreshToken) {
       return res.sendStatus(HttpStatuses.UNAUTHORIZED);
     }
-    let result = await refreshTokensCollection.deleteOne({
-      userId: new ObjectId(req.user?.id),
-    });
 
-    if (result.deletedCount === 1) {
-      res.sendStatus(HttpStatuses.NO_CONTENT);
+    const payload = await jwtService.verifyRefreshToken(refreshToken);
+    if (!payload) {
+      return res.sendStatus(HttpStatuses.UNAUTHORIZED);
     }
 
-    res.sendStatus(HttpStatuses.INTERNAL_SERVER_ERROR);
+    const tokenDoc = await refreshTokensCollection.findOne({
+      value: refreshToken,
+    });
+
+    if (!tokenDoc || !tokenDoc.isValid) {
+      return res.sendStatus(HttpStatuses.UNAUTHORIZED);
+    }
+
+    await refreshTokensCollection.updateOne(
+      { _id: tokenDoc._id, isValid: true },
+      { $set: { isValid: false } },
+    );
+
+    res.clearCookie('refreshToken');
+    return res.sendStatus(HttpStatuses.NO_CONTENT);
   },
 );
 
