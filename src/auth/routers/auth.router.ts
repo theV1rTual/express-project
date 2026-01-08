@@ -17,7 +17,13 @@ import { usersRepository } from '../../users/repositories/users.repository';
 import { createErrorMessages } from '../../core/utils/error.utils';
 import { jwtService } from '../adapters/jwt.service';
 import { ObjectId } from 'mongodb';
-import { refreshTokensCollection } from '../../db/mongo.db';
+import {
+  refreshTokensCollection,
+  securityDevicesCollection,
+} from '../../db/mongo.db';
+import { randomUUID } from 'crypto';
+import { add } from 'date-fns/add';
+import { SETTINGS } from '../../core/settings/settings';
 
 export const authRouter = Router({});
 
@@ -29,6 +35,8 @@ authRouter.post(
     const { loginOrEmail, password } = req.body;
 
     const result = await authService.login(loginOrEmail, password);
+    const deviceId = randomUUID();
+    const title = req.headers['user-agent'];
 
     if (result.status !== ResultStatus.Success) {
       return res
@@ -38,16 +46,37 @@ authRouter.post(
 
     const { refreshToken, accessToken, userId } = result.data!;
 
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: true,
-    });
+    res.cookie(
+      'refreshToken',
+      {
+        refreshToken,
+        deviceId,
+        userId,
+      },
+      {
+        httpOnly: true,
+        secure: true,
+      },
+    );
 
     await refreshTokensCollection.insertOne({
       _id: new ObjectId(),
       value: refreshToken as string,
       userId: userId,
       isValid: true,
+      deviceId,
+    });
+
+    await securityDevicesCollection.insertOne({
+      _id: new ObjectId(),
+      deviceId,
+      userId,
+      lastActiveDate: new Date(),
+      title: title ? title : '',
+      ip: req.ip as string,
+      expiredAt: add(new Date(), {
+        seconds: SETTINGS.RF_TIME,
+      }),
     });
 
     return res.status(HttpStatuses.OK).send({ accessToken });
@@ -58,6 +87,7 @@ authRouter.post(
   routersPaths.auth.refreshToken,
   async (req: Request, res: Response) => {
     const refreshToken = req.cookies.refreshToken;
+    const deviceId = refreshToken.deviceId;
 
     if (!refreshToken) {
       return res.sendStatus(HttpStatuses.UNAUTHORIZED);
@@ -93,6 +123,7 @@ authRouter.post(
       value: newRefreshToken as string,
       userId: new ObjectId(userId),
       isValid: true,
+      deviceId,
     });
 
     res.cookie('refreshToken', newRefreshToken, {

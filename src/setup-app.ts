@@ -16,6 +16,7 @@ export const setupApp = (app: Express) => {
   });
 
   app.use(cookieParser());
+  app.set('trust proxy', true);
 
   app.use(routersPaths.testing, testingRouter);
   app.use(routersPaths.posts, postRouter);
