@@ -50,16 +50,10 @@ authRouter.post(
 
     const { refreshToken, accessToken, userId } = result.data!;
 
-    res.cookie(
-      'refreshToken',
-      {
-        refreshToken,
-      },
-      {
-        httpOnly: true,
-        secure: true,
-      },
-    );
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: true,
+    });
 
     await refreshTokensCollection.insertOne({
       _id: new ObjectId(),
