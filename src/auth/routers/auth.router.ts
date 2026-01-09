@@ -94,14 +94,16 @@ authRouter.post(
     }
 
     const tokenDoc = await refreshTokensCollection.findOne({
-      value: refreshToken,
+      value: refreshToken.refreshToken,
     });
 
     if (!tokenDoc || !tokenDoc.isValid) {
       return res.sendStatus(HttpStatuses.UNAUTHORIZED);
     }
 
-    const payload = await jwtService.verifyRefreshToken(refreshToken);
+    const payload = await jwtService.verifyRefreshToken(
+      refreshToken.refreshToken,
+    );
 
     if (!payload) {
       return res.sendStatus(HttpStatuses.UNAUTHORIZED);
@@ -126,6 +128,18 @@ authRouter.post(
       deviceId,
     });
 
+    await securityDevicesCollection.updateOne(
+      { value: refreshToken.value },
+      {
+        $set: {
+          lastActiveDate: new Date(),
+          expiredAt: add(new Date(), {
+            seconds: SETTINGS.RF_TIME,
+          }),
+        },
+      },
+    );
+
     res.cookie('refreshToken', newRefreshToken, {
       httpOnly: true,
       secure: true,
@@ -143,13 +157,15 @@ authRouter.post(
       return res.sendStatus(HttpStatuses.UNAUTHORIZED);
     }
 
-    const payload = await jwtService.verifyRefreshToken(refreshToken);
+    const payload = await jwtService.verifyRefreshToken(
+      refreshToken.refreshToken,
+    );
     if (!payload) {
       return res.sendStatus(HttpStatuses.UNAUTHORIZED);
     }
 
     const tokenDoc = await refreshTokensCollection.findOne({
-      value: refreshToken,
+      value: refreshToken.refreshToken,
     });
 
     if (!tokenDoc || !tokenDoc.isValid) {
@@ -160,6 +176,11 @@ authRouter.post(
       { _id: tokenDoc._id, isValid: true },
       { $set: { isValid: false } },
     );
+
+    await securityDevicesCollection.deleteOne({
+      userId: refreshToken.userId,
+      deviceId: refreshToken.deviceId,
+    });
 
     res.clearCookie('refreshToken');
     return res.sendStatus(HttpStatuses.NO_CONTENT);

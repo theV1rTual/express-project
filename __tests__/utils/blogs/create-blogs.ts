@@ -3,7 +3,7 @@ import { BlogInputDto } from '../../../src/blogs/dto/blog.input-dto';
 import { BlogViewModel } from '../../../src/blogs/types/BlogViewModel';
 import { getBlogDto } from './get-blog-dto';
 import request from 'supertest';
-import { BLOGS_PATH } from '../../../src/core/paths/paths';
+import { routersPaths } from '../../../src/core/paths/paths';
 import { generateAdminAuthToken } from '../generate-admin-auth-token';
 import { HttpStatuses } from '../../../src/core/types/http-statuses';
 
@@ -18,7 +18,7 @@ export async function createBlog(
   };
 
   const createdBlogResponse = await request(app)
-    .post(BLOGS_PATH)
+    .post(routersPaths.blogs)
     .set('Authorization', generateAdminAuthToken())
     .send(testingBlogData)
     .expect(HttpStatuses.CREATED);

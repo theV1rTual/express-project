@@ -5,7 +5,7 @@ import { generateAdminAuthToken } from '../utils/generate-admin-auth-token';
 import { HttpStatuses } from '../../src/core/types/http-statuses';
 import { createBlog } from '../utils/blogs/create-blogs';
 import { BlogInputDto } from '../../src/blogs/dto/blog.input-dto';
-import { BLOGS_PATH, TESTING_PATH } from '../../src/core/paths/paths';
+import { routersPaths, TESTING_PATH } from '../../src/core/paths/paths';
 import { getBlogById } from '../utils/blogs/get-blog-by-id';
 import { updateBlog } from '../utils/blogs/update-blog';
 
@@ -37,7 +37,7 @@ describe('Blog API', function () {
     await createBlog(app);
 
     const blogsListResponse = await request(app)
-      .get(BLOGS_PATH)
+      .get(routersPaths.blogs)
       .set('Authorization', adminToken)
       .expect(HttpStatuses.OK);
 
