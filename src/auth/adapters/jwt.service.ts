@@ -8,8 +8,8 @@ export const jwtService = {
     });
   },
 
-  async createRefreshToken(userId: string): Promise<string> {
-    return jwt.sign({ userId }, SETTINGS.RF_SECRET, {
+  async createRefreshToken(userId: string, deviceId: string): Promise<string> {
+    return jwt.sign({ userId, deviceId }, SETTINGS.RF_SECRET, {
       expiresIn: SETTINGS.RF_TIME,
     });
   },

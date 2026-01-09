@@ -16,6 +16,7 @@ export const authService = {
   async login(
     loginOrEmail: string,
     password: string,
+    title: string,
   ): Promise<
     Result<{
       accessToken: string;
@@ -39,6 +40,7 @@ export const authService = {
 
     const refreshToken = await jwtService.createRefreshToken(
       result.data!._id.toString(),
+      title,
     );
 
     return {

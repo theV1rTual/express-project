@@ -33,10 +33,14 @@ authRouter.post(
   inputValidationResultMiddleware,
   async (req: RequestWithBody<AuthInputDto>, res: Response) => {
     const { loginOrEmail, password } = req.body;
-
-    const result = await authService.login(loginOrEmail, password);
     const deviceId = randomUUID();
     const title = req.headers['user-agent'];
+
+    const result = await authService.login(
+      loginOrEmail,
+      password,
+      title as string,
+    );
 
     if (result.status !== ResultStatus.Success) {
       return res
@@ -50,8 +54,6 @@ authRouter.post(
       'refreshToken',
       {
         refreshToken,
-        deviceId,
-        userId,
       },
       {
         httpOnly: true,
@@ -118,7 +120,10 @@ authRouter.post(
 
     const accessToken = await jwtService.createAccessToken(userId);
 
-    const newRefreshToken = await jwtService.createRefreshToken(userId);
+    const newRefreshToken = await jwtService.createRefreshToken(
+      userId,
+      deviceId,
+    );
 
     await refreshTokensCollection.insertOne({
       _id: new ObjectId(),
