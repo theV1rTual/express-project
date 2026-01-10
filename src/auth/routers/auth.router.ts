@@ -39,7 +39,7 @@ authRouter.post(
     const result = await authService.login(
       loginOrEmail,
       password,
-      title as string,
+      deviceId as string,
     );
 
     if (result.status !== ResultStatus.Success) {
