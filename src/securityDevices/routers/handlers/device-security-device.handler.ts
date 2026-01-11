@@ -2,12 +2,14 @@ import { Request, Response } from 'express';
 import { jwtService } from '../../../auth/adapters/jwt.service';
 import { HttpStatuses } from '../../../core/types/http-statuses';
 import { securityDevicesCollection } from '../../../db/mongo.db';
+import { ObjectId } from 'mongodb';
 
 export async function deviceSecurityDeviceHandler(req: Request, res: Response) {
   const deviceId = req.params.deviceId;
   const refreshToken = req.cookies.refreshToken;
+  const payload = await jwtService.verifyRefreshToken(refreshToken);
 
-  if (!(await jwtService.verifyRefreshToken(refreshToken.refreshToken))) {
+  if (!payload) {
     return res.sendStatus(HttpStatuses.UNAUTHORIZED);
   }
 
@@ -16,12 +18,18 @@ export async function deviceSecurityDeviceHandler(req: Request, res: Response) {
     return res.sendStatus(HttpStatuses.NOT_FOUND);
   }
 
-  if (doc.userId !== refreshToken.userId) {
+  if (doc.userId !== new ObjectId(payload?.userId)) {
     return res.sendStatus(HttpStatuses.FORBIDDEN);
   }
 
   const result = await securityDevicesCollection.deleteOne({
     deviceId,
-    userId: refreshToken.userId,
+    userId: new ObjectId(payload.userId),
   });
+
+  if (result.deletedCount === 1) {
+    return res.sendStatus(HttpStatuses.NO_CONTENT);
+  }
+
+  return res.sendStatus(HttpStatuses.INTERNAL_SERVER_ERROR);
 }
