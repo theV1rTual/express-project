@@ -7,7 +7,7 @@ import { ObjectId } from 'mongodb';
 
 export async function getSecurityDevicesHandler(req: Request, res: Response) {
   try {
-    const refreshToken = req.cookies;
+    const refreshToken = req.cookies.refreshToken;
 
     if (!(await jwtService.verifyRefreshToken(refreshToken.refreshToken))) {
       return res.sendStatus(HttpStatuses.UNAUTHORIZED);
