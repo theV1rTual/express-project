@@ -83,22 +83,32 @@ authRouter.post(
   routersPaths.auth.refreshToken,
   async (req: Request, res: Response) => {
     const refreshToken = req.cookies.refreshToken;
-    const payload = await jwtService.verifyRefreshToken(refreshToken);
-    const deviceId = payload?.deviceId;
 
     if (!refreshToken) {
       return res.sendStatus(HttpStatuses.UNAUTHORIZED);
     }
 
-    const tokenDoc = await refreshTokensCollection.findOne({
-      value: payload?.refreshToken,
-    });
+    console.log('refreshToken: ', refreshToken);
 
-    if (!tokenDoc || !tokenDoc.isValid) {
+    const payload = await jwtService.verifyRefreshToken(refreshToken);
+
+    console.log('payload', payload);
+
+    if (!payload) {
       return res.sendStatus(HttpStatuses.UNAUTHORIZED);
     }
 
-    if (!payload) {
+    const deviceId = payload?.deviceId;
+
+    console.log(await refreshTokensCollection.find().toArray());
+
+    const tokenDoc = await refreshTokensCollection.findOne({
+      value: refreshToken,
+    });
+
+    console.log('tokenDoc: ', tokenDoc);
+
+    if (!tokenDoc || !tokenDoc.isValid) {
       return res.sendStatus(HttpStatuses.UNAUTHORIZED);
     }
 
