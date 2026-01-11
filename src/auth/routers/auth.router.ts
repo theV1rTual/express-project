@@ -52,7 +52,7 @@ authRouter.post(
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      secure: false,
+      secure: true,
     });
 
     await refreshTokensCollection.insertOne({
