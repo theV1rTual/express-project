@@ -7,6 +7,11 @@ import { ObjectId } from 'mongodb';
 export async function deviceSecurityDeviceHandler(req: Request, res: Response) {
   const deviceId = req.params.deviceId;
   const refreshToken = req.cookies.refreshToken;
+
+  if (!refreshToken) {
+    return res.sendStatus(HttpStatuses.UNAUTHORIZED);
+  }
+
   const payload = await jwtService.verifyRefreshToken(refreshToken);
 
   if (!payload) {
