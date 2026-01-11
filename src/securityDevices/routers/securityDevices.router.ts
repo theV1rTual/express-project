@@ -8,4 +8,4 @@ export const securityDevicesRouter = Router({});
 securityDevicesRouter
   .get('', getSecurityDevicesHandler)
   .delete('', deleteAllSecurityDevicesHandler)
-  .delete(':/deviceId', deviceSecurityDeviceHandler);
+  .delete('/:deviceId', deviceSecurityDeviceHandler);

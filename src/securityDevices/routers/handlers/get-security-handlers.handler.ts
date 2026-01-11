@@ -6,7 +6,7 @@ import { jwtService } from '../../../auth/adapters/jwt.service';
 
 export async function getSecurityDevicesHandler(req: Request, res: Response) {
   try {
-    const refreshToken = req.cookies.refreshToken;
+    const refreshToken = req.cookies;
 
     if (!(await jwtService.verifyRefreshToken(refreshToken.refreshToken))) {
       return res.sendStatus(HttpStatuses.UNAUTHORIZED);
