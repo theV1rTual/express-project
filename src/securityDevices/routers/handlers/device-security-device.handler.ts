@@ -23,7 +23,7 @@ export async function deviceSecurityDeviceHandler(req: Request, res: Response) {
     return res.sendStatus(HttpStatuses.NOT_FOUND);
   }
 
-  if (doc.userId !== new ObjectId(payload?.userId)) {
+  if (doc.userId.toString() !== payload?.userId) {
     return res.sendStatus(HttpStatuses.FORBIDDEN);
   }
 

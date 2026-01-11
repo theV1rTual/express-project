@@ -87,20 +87,13 @@ authRouter.post(
     if (!refreshToken) {
       return res.sendStatus(HttpStatuses.UNAUTHORIZED);
     }
-
-    console.log('refreshToken: ', refreshToken);
-
     const payload = await jwtService.verifyRefreshToken(refreshToken);
-
-    console.log('payload', payload);
 
     if (!payload) {
       return res.sendStatus(HttpStatuses.UNAUTHORIZED);
     }
 
     const deviceId = payload?.deviceId;
-
-    console.log(await refreshTokensCollection.find().toArray());
 
     const tokenDoc = await refreshTokensCollection.findOne({
       value: refreshToken,
