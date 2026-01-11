@@ -1,7 +1,10 @@
 import { Request, Response } from 'express';
 import { jwtService } from '../../../auth/adapters/jwt.service';
 import { HttpStatuses } from '../../../core/types/http-statuses';
-import { securityDevicesCollection } from '../../../db/mongo.db';
+import {
+  refreshTokensCollection,
+  securityDevicesCollection,
+} from '../../../db/mongo.db';
 import { ObjectId } from 'mongodb';
 
 export async function deviceSecurityDeviceHandler(req: Request, res: Response) {
@@ -33,6 +36,17 @@ export async function deviceSecurityDeviceHandler(req: Request, res: Response) {
   });
 
   if (result.deletedCount === 1) {
+    await refreshTokensCollection.updateOne(
+      {
+        value: refreshToken,
+      },
+      {
+        $set: {
+          isValid: false,
+        },
+      },
+    );
+
     return res.sendStatus(HttpStatuses.NO_CONTENT);
   }
 
