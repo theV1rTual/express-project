@@ -20,7 +20,8 @@ export async function getSecurityDevicesHandler(req: Request, res: Response) {
       return res.sendStatus(HttpStatuses.NOT_FOUND);
     }
 
-    return result.map(mapSecurityDevicesDbToView);
+    const view = result.map(mapSecurityDevicesDbToView);
+    return res.status(HttpStatuses.OK).send(view);
   } catch (e) {
     return res.sendStatus(HttpStatuses.INTERNAL_SERVER_ERROR);
   }
