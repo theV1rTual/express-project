@@ -83,9 +83,8 @@ authRouter.post(
   routersPaths.auth.refreshToken,
   async (req: Request, res: Response) => {
     const refreshToken = req.cookies.refreshToken;
-    const deviceId = refreshToken.deviceId;
-
     const payload = await jwtService.verifyRefreshToken(refreshToken);
+    const deviceId = payload?.deviceId;
 
     if (!refreshToken) {
       return res.sendStatus(HttpStatuses.UNAUTHORIZED);
@@ -114,7 +113,7 @@ authRouter.post(
 
     const newRefreshToken = await jwtService.createRefreshToken(
       userId,
-      deviceId,
+      deviceId as string,
     );
 
     await refreshTokensCollection.insertOne({
@@ -122,7 +121,7 @@ authRouter.post(
       value: newRefreshToken as string,
       userId: new ObjectId(userId),
       isValid: true,
-      deviceId,
+      deviceId: deviceId as string,
     });
 
     await securityDevicesCollection.updateOne(
