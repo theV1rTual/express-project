@@ -3,6 +3,7 @@ import { securityDevicesCollection } from '../../../db/mongo.db';
 import { HttpStatuses } from '../../../core/types/http-statuses';
 import { mapSecurityDevicesDbToView } from '../mappers/mapSecurityDevices';
 import { jwtService } from '../../../auth/adapters/jwt.service';
+import { ObjectId } from 'mongodb';
 
 export async function getSecurityDevicesHandler(req: Request, res: Response) {
   try {
@@ -13,7 +14,7 @@ export async function getSecurityDevicesHandler(req: Request, res: Response) {
     }
 
     const result = await securityDevicesCollection
-      .find({ userId: refreshToken.userId })
+      .find({ userId: new ObjectId(refreshToken.userId) })
       .toArray();
 
     if (!result) {
