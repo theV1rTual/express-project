@@ -85,21 +85,19 @@ authRouter.post(
     const refreshToken = req.cookies.refreshToken;
     const deviceId = refreshToken.deviceId;
 
+    const payload = await jwtService.verifyRefreshToken(refreshToken);
+
     if (!refreshToken) {
       return res.sendStatus(HttpStatuses.UNAUTHORIZED);
     }
 
     const tokenDoc = await refreshTokensCollection.findOne({
-      value: refreshToken.refreshToken,
+      value: payload?.refreshToken,
     });
 
     if (!tokenDoc || !tokenDoc.isValid) {
       return res.sendStatus(HttpStatuses.UNAUTHORIZED);
     }
-
-    const payload = await jwtService.verifyRefreshToken(
-      refreshToken.refreshToken,
-    );
 
     if (!payload) {
       return res.sendStatus(HttpStatuses.UNAUTHORIZED);
