@@ -9,12 +9,14 @@ export async function getSecurityDevicesHandler(req: Request, res: Response) {
   try {
     const refreshToken = req.cookies.refreshToken;
 
+    const payload = await jwtService.verifyToken(refreshToken.refreshToken);
+
     if (!(await jwtService.verifyRefreshToken(refreshToken))) {
       return res.sendStatus(HttpStatuses.UNAUTHORIZED);
     }
 
     const result = await securityDevicesCollection
-      .find({ userId: new ObjectId(refreshToken.userId) })
+      .find({ userId: new ObjectId(payload?.userId) })
       .toArray();
 
     if (!result) {
