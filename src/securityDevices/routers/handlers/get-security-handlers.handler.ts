@@ -9,7 +9,7 @@ export async function getSecurityDevicesHandler(req: Request, res: Response) {
   try {
     const refreshToken = req.cookies.refreshToken;
 
-    if (!(await jwtService.verifyRefreshToken(refreshToken.refreshToken))) {
+    if (!(await jwtService.verifyRefreshToken(refreshToken))) {
       return res.sendStatus(HttpStatuses.UNAUTHORIZED);
     }
 
