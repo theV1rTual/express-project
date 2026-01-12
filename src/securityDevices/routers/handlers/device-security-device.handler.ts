@@ -12,7 +12,7 @@ export async function deviceSecurityDeviceHandler(req: Request, res: Response) {
   const refreshToken = req.cookies.refreshToken;
 
   if (!refreshToken) {
-    return res.sendStatus(HttpStatuses.UNAUTHORIZED);
+    return res.sendStatus(401);
   }
 
   const payload = await jwtService.verifyRefreshToken(refreshToken);
