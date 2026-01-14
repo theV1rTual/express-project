@@ -38,7 +38,8 @@ export async function deviceSecurityDeviceHandler(req: Request, res: Response) {
   if (result.deletedCount === 1) {
     await refreshTokensCollection.updateOne(
       {
-        value: refreshToken,
+        serId: new ObjectId(payload.userId),
+        deviceId: deviceId,
       },
       {
         $set: {
