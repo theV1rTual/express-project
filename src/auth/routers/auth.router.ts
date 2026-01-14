@@ -160,15 +160,13 @@ authRouter.post(
       return res.sendStatus(HttpStatuses.UNAUTHORIZED);
     }
 
-    const payload = await jwtService.verifyRefreshToken(
-      refreshToken.refreshToken,
-    );
+    const payload = await jwtService.verifyRefreshToken(refreshToken);
     if (!payload) {
       return res.sendStatus(HttpStatuses.UNAUTHORIZED);
     }
 
     const tokenDoc = await refreshTokensCollection.findOne({
-      value: refreshToken.refreshToken,
+      value: refreshToken,
     });
 
     if (!tokenDoc || !tokenDoc.isValid) {
@@ -181,8 +179,8 @@ authRouter.post(
     );
 
     await securityDevicesCollection.deleteOne({
-      userId: refreshToken.userId,
-      deviceId: refreshToken.deviceId,
+      userId: new ObjectId(payload.userId),
+      deviceId: payload.deviceId,
     });
 
     res.clearCookie('refreshToken');
