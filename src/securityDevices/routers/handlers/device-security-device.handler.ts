@@ -36,16 +36,16 @@ export async function deviceSecurityDeviceHandler(req: Request, res: Response) {
   });
 
   if (result.deletedCount === 1) {
+    const userObjectId = new ObjectId(payload.userId);
+
+    await refreshTokensCollection.updateMany(
+      { userId: userObjectId, deviceId, isValid: true },
+      { $set: { isValid: false } },
+    );
+
     await refreshTokensCollection.updateOne(
-      {
-        serId: new ObjectId(payload.userId),
-        deviceId: deviceId,
-      },
-      {
-        $set: {
-          isValid: false,
-        },
-      },
+      { value: refreshToken, isValid: true },
+      { $set: { isValid: false } },
     );
 
     return res.sendStatus(HttpStatuses.NO_CONTENT);
