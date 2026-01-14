@@ -93,13 +93,17 @@ authRouter.post(
       return res.sendStatus(HttpStatuses.UNAUTHORIZED);
     }
 
+    const session = await securityDevicesCollection.findOne({
+      deviceId: payload.deviceId,
+      userId: new ObjectId(payload.userId),
+    });
+    if (!session) return res.sendStatus(HttpStatuses.UNAUTHORIZED);
+
     const deviceId = payload?.deviceId;
 
     const tokenDoc = await refreshTokensCollection.findOne({
       value: refreshToken,
     });
-
-    console.log('tokenDoc: ', tokenDoc);
 
     if (!tokenDoc || !tokenDoc.isValid) {
       return res.sendStatus(HttpStatuses.UNAUTHORIZED);
@@ -128,7 +132,7 @@ authRouter.post(
     });
 
     await securityDevicesCollection.updateOne(
-      { value: refreshToken.value },
+      { deviceId: deviceId as string, userId: new ObjectId(userId) },
       {
         $set: {
           lastActiveDate: new Date(),
