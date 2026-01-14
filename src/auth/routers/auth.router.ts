@@ -22,6 +22,8 @@ import {
   securityDevicesCollection,
 } from '../../db/mongo.db';
 import { randomUUID } from 'crypto';
+import { add } from 'date-fns/add';
+import { SETTINGS } from '../../core/settings/settings';
 
 export const authRouter = Router({});
 
@@ -53,11 +55,6 @@ authRouter.post(
       secure: true,
     });
 
-    const payload = await jwtService.verifyRefreshToken(refreshToken);
-    if (!payload) {
-      return res.sendStatus(HttpStatuses.UNAUTHORIZED);
-    }
-
     await refreshTokensCollection.insertOne({
       _id: new ObjectId(),
       value: refreshToken as string,
@@ -70,10 +67,12 @@ authRouter.post(
       _id: new ObjectId(),
       deviceId,
       userId,
-      lastActiveDate: new Date(payload.iat * 1000),
-      expiredAt: new Date(payload.exp * 1000),
+      lastActiveDate: new Date(),
       title: title ? title : '',
       ip: req.ip as string,
+      expiredAt: add(new Date(), {
+        seconds: SETTINGS.RF_TIME,
+      }),
     });
 
     return res.status(HttpStatuses.OK).send({ accessToken });
@@ -136,8 +135,10 @@ authRouter.post(
       { deviceId: deviceId as string, userId: new ObjectId(userId) },
       {
         $set: {
-          lastActiveDate: new Date(payload.iat * 1000),
-          expiredAt: new Date(payload.exp * 1000),
+          lastActiveDate: new Date(),
+          expiredAt: add(new Date(), {
+            seconds: SETTINGS.RF_TIME,
+          }),
         },
       },
     );
