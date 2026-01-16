@@ -1,7 +1,10 @@
 import { Request, Response } from 'express';
 import { jwtService } from '../../../auth/adapters/jwt.service';
 import { HttpStatuses } from '../../../core/types/http-statuses';
-import { securityDevicesCollection } from '../../../db/mongo.db';
+import {
+  refreshTokensCollection,
+  securityDevicesCollection,
+} from '../../../db/mongo.db';
 import { ObjectId } from 'mongodb';
 
 export async function deleteAllSecurityDevicesHandler(
@@ -12,6 +15,14 @@ export async function deleteAllSecurityDevicesHandler(
   const payload = await jwtService.verifyRefreshToken(refreshToken);
 
   if (!payload) {
+    return res.sendStatus(HttpStatuses.UNAUTHORIZED);
+  }
+
+  const tokenDoc = await refreshTokensCollection.findOne({
+    value: refreshToken,
+  });
+
+  if (!tokenDoc || !tokenDoc.isValid) {
     return res.sendStatus(HttpStatuses.UNAUTHORIZED);
   }
 
