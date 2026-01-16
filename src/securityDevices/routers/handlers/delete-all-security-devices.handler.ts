@@ -17,6 +17,7 @@ export async function deleteAllSecurityDevicesHandler(
 
   const result = await securityDevicesCollection.deleteMany({
     userId: new ObjectId(payload?.userId),
+    deviceId: { $ne: payload.deviceId }, // ← key fix
   });
 
   if (result) {
