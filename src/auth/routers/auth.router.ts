@@ -24,11 +24,13 @@ import {
 import { randomUUID } from 'crypto';
 import { add } from 'date-fns/add';
 import { SETTINGS } from '../../core/settings/settings';
+import { ipUrlRateLimiterMiddleware } from '../../core/middlewares/ipUrlRateLimiter.middleware';
 
 export const authRouter = Router({});
 
 authRouter.post(
   routersPaths.auth.login,
+  ipUrlRateLimiterMiddleware,
   passwordValidation,
   inputValidationResultMiddleware,
   async (req: RequestWithBody<AuthInputDto>, res: Response) => {
@@ -81,6 +83,7 @@ authRouter.post(
 
 authRouter.post(
   routersPaths.auth.refreshToken,
+  ipUrlRateLimiterMiddleware,
   async (req: Request, res: Response) => {
     const refreshToken = req.cookies.refreshToken;
 
@@ -230,6 +233,7 @@ authRouter.post(
 
 authRouter.post(
   routersPaths.auth.registration,
+  ipUrlRateLimiterMiddleware,
   passwordValidation,
   loginValidation,
   emailValidation,
