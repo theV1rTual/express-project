@@ -205,6 +205,7 @@ authRouter.get(
 
 authRouter.post(
   routersPaths.auth.registrationConfirmation,
+  ipUrlRateLimiterMiddleware,
   async (req: Request, res: Response) => {
     const user = await usersRepository.findByCode(req.body.code);
     if (!user) {
@@ -258,6 +259,7 @@ authRouter.post(
 
 authRouter.post(
   routersPaths.auth.registrationEmailResending,
+  ipUrlRateLimiterMiddleware,
   emailValidation,
   inputValidationResultMiddleware,
   async (req: Request, res: Response) => {
