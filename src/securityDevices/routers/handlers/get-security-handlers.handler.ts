@@ -8,20 +8,22 @@ import { ObjectId } from 'mongodb';
 export async function getSecurityDevicesHandler(req: Request, res: Response) {
   try {
     const refreshToken = req.cookies.refreshToken;
-    const payload = await jwtService.verifyRefreshToken(refreshToken);
-
-    if (!(await jwtService.verifyRefreshToken(refreshToken))) {
+    if (!refreshToken) {
       return res.sendStatus(HttpStatuses.UNAUTHORIZED);
     }
+
+    const payload = await jwtService.verifyRefreshToken(refreshToken);
+    if (!payload) {
+      return res.sendStatus(HttpStatuses.UNAUTHORIZED);
+    }
+
     const result = await securityDevicesCollection
       .find({ userId: new ObjectId(payload?.userId) })
       .toArray();
-    if (!result) {
-      return res.sendStatus(HttpStatuses.NOT_FOUND);
-    }
 
-    const view = result.map(mapSecurityDevicesDbToView);
-    return res.status(HttpStatuses.OK).send(view);
+    return res
+      .status(HttpStatuses.OK)
+      .send(result.map(mapSecurityDevicesDbToView));
   } catch (e) {
     return res.sendStatus(HttpStatuses.INTERNAL_SERVER_ERROR);
   }
