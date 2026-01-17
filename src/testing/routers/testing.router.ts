@@ -4,7 +4,10 @@ import { blogsRepository } from '../../blogs/repositories/blogs.repository';
 import { postsRepository } from '../../posts/repositories/posts.repository';
 import { usersRepository } from '../../users/repositories/users.repository';
 import { commentRepository } from '../../comments/repository/comment.repository';
-import { securityDevicesCollection } from '../../db/mongo.db';
+import {
+  apiRequestLogCollection,
+  securityDevicesCollection,
+} from '../../db/mongo.db';
 
 export const testingRouter = Router({});
 
@@ -14,6 +17,7 @@ testingRouter.delete('/all-data', async (req: Request, res: Response) => {
   await usersRepository.clear();
   await commentRepository.clear();
   await securityDevicesCollection.deleteMany({});
+  await apiRequestLogCollection.deleteMany({});
 
   res.sendStatus(HttpStatuses.NO_CONTENT);
 });

@@ -8,6 +8,7 @@ import { authRouter } from './auth/routers/auth.router';
 import { commentsRouter } from './comments/routers/comments.router';
 import cookieParser from 'cookie-parser';
 import { securityDevicesRouter } from './securityDevices/routers/securityDevices.router';
+import { ipUrlRateLimiterMiddleware } from './core/middlewares/ipUrlRateLimiter.middleware';
 
 export const setupApp = (app: Express) => {
   app.use(express.json());
@@ -18,6 +19,8 @@ export const setupApp = (app: Express) => {
 
   app.use(cookieParser());
   app.set('trust proxy', true);
+
+  app.use(ipUrlRateLimiterMiddleware);
 
   app.use(routersPaths.testing, testingRouter);
   app.use(routersPaths.posts, postRouter);
