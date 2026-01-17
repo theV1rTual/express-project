@@ -13,19 +13,13 @@ export async function deleteAllSecurityDevicesHandler(
 ) {
   const refreshToken = req.cookies.refreshToken;
   if (!refreshToken) {
+    console.log(456);
     return res.sendStatus(HttpStatuses.UNAUTHORIZED);
   }
 
   const payload = await jwtService.verifyRefreshToken(refreshToken);
   if (!payload) {
-    return res.sendStatus(HttpStatuses.UNAUTHORIZED);
-  }
-
-  // текущий токен должен быть валиден
-  const tokenDoc = await refreshTokensCollection.findOne({
-    value: refreshToken,
-  });
-  if (!tokenDoc || !tokenDoc.isValid) {
+    console.log(123);
     return res.sendStatus(HttpStatuses.UNAUTHORIZED);
   }
 
