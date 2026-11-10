@@ -3,7 +3,7 @@ import { blogsRepository } from '../../repositories/blogs.repository';
 import { HttpStatuses } from '../../../core/types/http-statuses';
 import { createErrorMessages } from '../../../core/utils/error.utils';
 
-export async function deleteBlogHandler(req: Request, res: Response) {
+export async function deleteBlogHandler(req: Request<{ id: string }>, res: Response) {
   const id = req.params.id;
   const blog = blogsRepository.findById(id);
 

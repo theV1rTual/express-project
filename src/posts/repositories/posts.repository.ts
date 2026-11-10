@@ -6,8 +6,10 @@ import { mapPostDbToPostView } from '../routers/mappers/mapPostDbToPostView';
 import { PostDbModel } from '../types/PostDbModel';
 import { blogsRepository } from '../../blogs/repositories/blogs.repository';
 import { PostQueryInput } from '../routers/input /post-query.input';
+import { injectable } from 'inversify';
 
-export const postsRepository = {
+@injectable()
+export class PostsRepository {
   async findAll(
     queryDto: PostQueryInput,
   ): Promise<{ items: PostDbModel[]; totalCount: number }> {
@@ -30,7 +32,7 @@ export const postsRepository = {
 
     const totalCount = await postsCollection.countDocuments(filter);
     return { items, totalCount };
-  },
+  }
 
   async findById(id: string): Promise<PostViewModel | null> {
     const postDb = await postsCollection.findOne({ _id: new ObjectId(id) });
@@ -38,7 +40,7 @@ export const postsRepository = {
       return null;
     }
     return mapPostDbToPostView(postDb);
-  },
+  }
 
   async create(newPost: PostInputDto): Promise<PostViewModel | null> {
     const blog = await blogsRepository.findById(newPost.blogId);
@@ -58,7 +60,7 @@ export const postsRepository = {
     };
     await postsCollection.insertOne(docToInsert);
     return mapPostDbToPostView(docToInsert);
-  },
+  }
 
   async update(id: string, dto: PostInputDto): Promise<boolean> {
     const updatedResult = await postsCollection.updateOne(
@@ -76,7 +78,7 @@ export const postsRepository = {
     );
 
     return updatedResult.matchedCount === 1;
-  },
+  }
 
   async delete(id: string): Promise<boolean> {
     const deletedResult = await postsCollection.deleteOne({
@@ -84,9 +86,9 @@ export const postsRepository = {
     });
 
     return deletedResult.deletedCount === 1;
-  },
+  }
 
   async clear(): Promise<void> {
     await postsCollection.deleteMany({});
-  },
+  }
 };

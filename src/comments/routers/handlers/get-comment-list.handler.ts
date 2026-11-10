@@ -5,10 +5,13 @@ import { setDefaultSortAndPagination } from '../../../core/helpers/set-default-s
 import { CommentsService } from '../../application/comments.service';
 import { errorsHandler } from '../../../core/errors/errors.handler';
 import { mapToCommentListPaginatedOutput } from '../mappers/mapToCommentListPaginatedOutput.utils';
-import { postsRepository } from '../../../posts/repositories/posts.repository';
+import { PostsRepository } from '../../../posts/repositories/posts.repository';
 import { HttpStatuses } from '../../../core/types/http-statuses';
+import { container } from '../../../composition-root';
 
-export async function getCommentListHandler(req: Request, res: Response) {
+const postsRepository = container.get(PostsRepository)
+
+export async function getCommentListHandler(req: Request<{ postId: string }>, res: Response) {
   try {
     const postId = req.params.postId;
     const post = await postsRepository.findById(postId);

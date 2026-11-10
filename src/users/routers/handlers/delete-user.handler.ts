@@ -3,7 +3,7 @@ import { usersRepository } from '../../repositories/users.repository';
 import { HttpStatuses } from '../../../core/types/http-statuses';
 import { createErrorMessages } from '../../../core/middlewares/validation/input-validation-result.middleware';
 
-export async function deleteUserHandler(req: Request, res: Response) {
+export async function deleteUserHandler(req: Request<{ id: string }>, res: Response) {
   const id = req.params.id;
   const user = usersRepository.findById(id);
 

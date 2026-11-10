@@ -14,10 +14,13 @@ import { paginationAndSortingValidation } from '../../core/middlewares/validatio
 import { BlogSortField } from './input/blog-sort-field';
 import { postForBlogCreateInputValidation } from '../../posts/validation/post.input-dto-validation-middlewares';
 import { createPostForBlogHandler } from './handlers/create-post-for-blog.handler';
-import { getPostsListHandler } from '../../posts/routers/handlers/get-posts-list.handler';
 import { PostSortFields } from '../../posts/routers/input /post-sort-fields';
+import { container } from '../../composition-root';
+import { PostController } from '../../posts/routers/handlers/posts.controller';
 
 export const blogsRouter = Router({});
+
+const postController = container.get(PostController)
 
 blogsRouter
   .get('', paginationAndSortingValidation(BlogSortField), getBlogsListHandler)
@@ -31,7 +34,7 @@ blogsRouter
   .get(
     '/:id/posts',
     paginationAndSortingValidation(PostSortFields),
-    getPostsListHandler,
+    postController.getPostsList.bind(postController),
   )
   .get('/:id', getBlogHandler)
   .post(

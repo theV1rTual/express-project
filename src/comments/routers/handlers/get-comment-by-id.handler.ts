@@ -3,7 +3,7 @@ import { commentRepository } from '../../repository/comment.repository';
 import { HttpStatuses } from '../../../core/types/http-statuses';
 import { createErrorMessages } from '../../../core/utils/error.utils';
 
-export async function getCommentByIdHandler(req: Request, res: Response) {
+export async function getCommentByIdHandler(req: Request<{ id: string }>, res: Response) {
   const id = req.params.id;
 
   const comment = await commentRepository.findById(id);

@@ -1,11 +1,6 @@
 import { Router } from 'express';
-import { getPostsListHandler } from './handlers/get-posts-list.handler';
 import { superAdminGuardMiddleware } from '../../auth/middlewares/super-admin.guard-middleware';
 import { inputValidationResultMiddleware } from '../../core/middlewares/validation/input-validation-result.middleware';
-import { createPostHandler } from './handlers/create-post.handler';
-import { getPostHandler } from './handlers/get-post.handler';
-import { updatePostHandler } from './handlers/update-post.handler';
-import { deletePostHandler } from './handlers/delete-post.handler';
 import {
   postCreateInputValidation,
   postUpdateInputValidation,
@@ -17,25 +12,29 @@ import { accessTokenGuard } from '../../auth/guards/access.token.guard';
 import { commentCreateInputValidation } from '../../comments/validation/comment.input-dto.validation-middlewares';
 import { createCommentHandler } from '../../comments/routers/handlers/create-comment.handler';
 import { CommentSortField } from '../../comments/routers/input/comment-sort-field';
+import { PostController } from './handlers/posts.controller';
+import { container } from '../../composition-root';
 
 export const postRouter = Router({});
 
+const postController = container.get(PostController)
+
 postRouter
-  .get('', paginationAndSortingValidation(PostSortFields), getPostsListHandler)
-  .get('/:id', getPostHandler)
+  .get('', paginationAndSortingValidation(PostSortFields), postController.getPostsList.bind(postController))
+  .get('/:id', postController.getPost.bind(postController))
   .post(
     '/',
     superAdminGuardMiddleware,
     postCreateInputValidation,
     inputValidationResultMiddleware,
-    createPostHandler,
+    postController.createPost.bind(postController),
   )
   .put(
     '/:id',
     superAdminGuardMiddleware,
     postUpdateInputValidation,
     inputValidationResultMiddleware,
-    updatePostHandler,
+    postController.update.bind(postController),
   )
   .post(
     '/:postId/comments',
@@ -49,4 +48,4 @@ postRouter
     paginationAndSortingValidation(CommentSortField),
     getCommentListHandler,
   )
-  .delete('/:id', superAdminGuardMiddleware, deletePostHandler);
+  .delete('/:id', superAdminGuardMiddleware, postController.delete.bind(postController));

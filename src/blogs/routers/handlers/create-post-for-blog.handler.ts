@@ -1,10 +1,13 @@
 import { Request, Response } from 'express';
 import { PostInputDto } from '../../../posts/dto/post.input-dto';
-import { postsRepository } from '../../../posts/repositories/posts.repository';
+import { PostsRepository } from '../../../posts/repositories/posts.repository';
 import { HttpStatuses } from '../../../core/types/http-statuses';
 import { ObjectId } from 'mongodb';
+import { container } from '../../../composition-root';
 
 type Params = { id: string };
+
+const postsRepository = container.get(PostsRepository)
 
 export async function createPostForBlogHandler(
   req: Request<Params, {}, Omit<PostInputDto, 'blogId'>>,
