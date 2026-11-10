@@ -203,6 +203,27 @@ export const usersRepository = {
     )
   },
 
+  async updatePasswordByRecoveryCode(
+    recoveryCode: string,
+    passwordHash: string,
+  ): Promise<boolean> {
+    const result = await usersCollection.updateOne(
+      {
+        'passwordRecovery.recoveryCode': recoveryCode,
+        'passwordRecovery.expirationDate': { $gt: new Date() },
+      },
+      {
+        $set: {
+          passwordHash,
+          'passwordRecovery.recoveryCode': null,
+          'passwordRecovery.expirationDate': null,
+        },
+      },
+    );
+
+    return result.matchedCount === 1;
+  },
+
   async delete(id: string): Promise<boolean> {
     const deletedResult = await usersCollection.deleteOne({
       _id: new ObjectId(id),

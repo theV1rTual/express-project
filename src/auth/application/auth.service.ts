@@ -183,8 +183,30 @@ export const authService = {
     };
   },
 
-  async newPassword(code: string, recoveryPassword: string) {
+  async newPassword(recoveryCode: string, newPassword: string) {
+    const passwordHash = await bcryptService.generateHash(newPassword);
 
+    const updated = await usersRepository.updatePasswordByRecoveryCode(
+      recoveryCode,
+      passwordHash,
+    );
+
+    if (!updated) {
+      return {
+        status: ResultStatus.BadRequest,
+        extensions: [
+          {
+            field: 'recoveryCode',
+            message: 'Recovery code is invalid or expired',
+          },
+        ],
+      };
+    }
+
+    return {
+      status: ResultStatus.Success,
+      extensions: [],
+    };
   },
 
   async registerUser(login: string, password: string, email: string) {

@@ -25,6 +25,7 @@ import { randomUUID } from 'crypto';
 import { add } from 'date-fns/add';
 import { SETTINGS } from '../../core/settings/settings';
 import { ipUrlRateLimiterMiddleware } from '../../core/middlewares/ipUrlRateLimiter.middleware';
+import { body } from 'express-validator';
 
 export const authRouter = Router({});
 
@@ -228,6 +229,57 @@ authRouter.post(
     }
     if (result.status === ResultStatus.Success) {
       return res.sendStatus(HttpStatuses.NO_CONTENT);
+    }
+  },
+);
+
+authRouter.post(
+  routersPaths.auth.newPassword,
+  ipUrlRateLimiterMiddleware,
+
+  body('newPassword')
+    .isString()
+    .withMessage('New password should be string')
+    .bail()
+    .trim()
+    .isLength({ min: 6, max: 20 })
+    .withMessage('New password length should be 6–20 characters'),
+
+  body('recoveryCode')
+    .isString()
+    .withMessage('Recovery code should be string')
+    .bail()
+    .notEmpty()
+    .withMessage('Recovery code is required'),
+
+  inputValidationResultMiddleware,
+
+  async (
+    req: Request<{}, {}, {
+      newPassword: string;
+      recoveryCode: string;
+    }>,
+    res: Response,
+  ) => {
+    try {
+      const { recoveryCode, newPassword } = req.body;
+
+      const result = await authService.newPassword(
+        recoveryCode,
+        newPassword,
+      );
+
+      if (result.status === ResultStatus.BadRequest) {
+        res
+          .status(HttpStatuses.BAD_REQUEST)
+          .send(createErrorMessages(result.extensions));
+        return;
+      }
+
+      res.sendStatus(HttpStatuses.NO_CONTENT);
+    } catch (error: unknown) {
+      console.error(error);
+      res.sendStatus(HttpStatuses.INTERNAL_SERVER_ERROR);
     }
   },
 );

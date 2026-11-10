@@ -14,7 +14,7 @@ export const routersPaths = {
     registrationEmailResending: '/auth/registration-email-resending',
     refreshToken: '/auth/refresh-token',
     passwordRecovery: '/auth/password-recovery',
-    newPassword: '/new-password',
+    newPassword: '/auth/new-password',
     logout: '/auth/logout',
   },
 };
