@@ -142,6 +142,51 @@ export const authService = {
     };
   },
 
+  async recoverPassword(email: string) {
+    const user = await usersRepository.findByEmail(email);
+
+    const code = {
+      recoveryCode: randomUUID(),
+      expirationDate: add(new Date(), {
+        hours: 1,
+        minutes: 30,
+      }),
+    }
+
+    if (!user) {
+      return {
+        status: ResultStatus.BadRequest,
+        extensions: [{ field: 'user', message: 'User not found' }],
+      };
+    }
+
+    await usersRepository.setRecovery(user._id, code)
+
+    try {
+      await nodemailerService.sendEmail(
+        user.email,
+        code.recoveryCode,
+        emailExamples.passwordRecovery,
+      );
+
+
+    } catch (e) {
+      console.log('error in send email', e);
+      // чтобы тест не ждал письмо бесконечно
+      return { status: ResultStatus.BadRequest, data: null, extensions: [] };
+    }
+
+    return {
+      status: ResultStatus.Success,
+      data: {},
+      extensions: [],
+    };
+  },
+
+  async newPassword(code: string, recoveryPassword: string) {
+
+  },
+
   async registerUser(login: string, password: string, email: string) {
     const loginExists = await usersRepository.findByLogin(login);
     const emailExists = await usersRepository.findByEmail(email);

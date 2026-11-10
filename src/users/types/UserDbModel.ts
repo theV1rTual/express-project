@@ -11,5 +11,9 @@ export type UserDbModel = {
     expirationDate: Date | null;
     isConfirmed: boolean;
   };
+  passwordRecovery: {
+    recoveryCode: string | null,
+    expirationDate: Date | null
+  };
   refreshToken: string | null;
 };

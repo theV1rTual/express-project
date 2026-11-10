@@ -232,6 +232,26 @@ authRouter.post(
   },
 );
 
+
+authRouter.post(routersPaths.auth.passwordRecovery, ipUrlRateLimiterMiddleware, emailValidation, inputValidationResultMiddleware, async (req: Request, res: Response) => {
+  const email = req.body.email;
+
+  const result = await authService.recoverPassword(email);
+
+  if (result.status === ResultStatus.BadRequest) {
+    res
+      .status(HttpStatuses.BAD_REQUEST)
+      .send(
+        createErrorMessages([{ field: 'email', message: 'User not found' }]),
+      );
+    return;
+  }
+
+  if (result.status === ResultStatus.Success) {
+    return res.sendStatus(HttpStatuses.NO_CONTENT);
+  }
+})
+
 authRouter.post(
   routersPaths.auth.registration,
   ipUrlRateLimiterMiddleware,

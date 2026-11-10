@@ -13,6 +13,8 @@ export const routersPaths = {
     registration: '/auth/registration',
     registrationEmailResending: '/auth/registration-email-resending',
     refreshToken: '/auth/refresh-token',
+    passwordRecovery: '/auth/password-recovery',
+    newPassword: '/new-password',
     logout: '/auth/logout',
   },
 };

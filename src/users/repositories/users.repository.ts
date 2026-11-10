@@ -162,6 +162,10 @@ export const usersRepository = {
         }),
         isConfirmed: false,
       },
+      passwordRecovery: {
+        recoveryCode: null,
+        expirationDate: null,
+      },
       refreshToken: null,
     };
     await usersCollection.insertOne(docToInsert);
@@ -186,6 +190,17 @@ export const usersRepository = {
       },
     );
     return result.matchedCount === 1;
+  },
+
+  async setRecovery(id: ObjectId, payload: UserDbModel['passwordRecovery']) {
+    const result = await usersCollection.updateOne(
+      {
+        _id: new ObjectId(id)
+      },
+      {
+        $set: { passwordRecovery: payload }
+      }
+    )
   },
 
   async delete(id: string): Promise<boolean> {
