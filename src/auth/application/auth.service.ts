@@ -153,12 +153,12 @@ export const authService = {
       }),
     }
 
-    // if (!user) {
-    //   return {
-    //     status: ResultStatus.BadRequest,
-    //     extensions: [{ field: 'user', message: 'User not found' }],
-    //   };
-    // }
+    if (!user) {
+      return {
+        status: ResultStatus.Success,
+        extensions: [],
+      };
+    }
 
     await usersRepository.setRecovery(user._id, code)
 
