@@ -1,5 +1,6 @@
 import { CommentDbModel } from '../../types/CommentDbModel';
 import { CommentListPaginatedOutput } from '../../types/CommentListPaginated.output';
+import { mapCommentDbToCommentView } from './mapCommentDbToCommentView';
 
 export function mapToCommentListPaginatedOutput(
   comments: CommentDbModel[],
@@ -8,20 +9,13 @@ export function mapToCommentListPaginatedOutput(
     pageSize: number;
     totalCount: number;
   },
+  viewerId?: string
 ): CommentListPaginatedOutput {
   return {
     pagesCount: Math.ceil(meta.totalCount / meta.pageSize),
     page: meta.page,
     pageSize: meta.pageSize,
     totalCount: meta.totalCount,
-    items: comments.map((comment: CommentDbModel) => ({
-      id: comment._id.toString(),
-      content: comment.content,
-      commentatorInfo: {
-        userId: comment.commentatorInfo.userId,
-        userLogin: comment.commentatorInfo.userLogin,
-      },
-      createdAt: comment.createdAt,
-    })),
+    items: comments.map(comment => mapCommentDbToCommentView(comment, viewerId)),
   };
 }

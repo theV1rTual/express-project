@@ -29,11 +29,14 @@ export async function getCommentListHandler(req: Request<{ postId: string }>, re
       postId,
     );
 
-    const commentsListOutput = mapToCommentListPaginatedOutput(items, {
-      page: queryInput.pageNumber,
-      pageSize: queryInput.pageSize,
-      totalCount,
-    });
+    const commentsListOutput = mapToCommentListPaginatedOutput(
+      items,
+      {
+        page: queryInput.pageNumber,
+        pageSize: queryInput.pageSize,
+        totalCount,
+      },
+      req.user?.id);
 
     res.send(commentsListOutput);
   } catch (e) {

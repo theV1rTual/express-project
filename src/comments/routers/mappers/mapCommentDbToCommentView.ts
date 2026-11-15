@@ -3,6 +3,7 @@ import { CommentViewModel } from '../../types/CommentViewModel';
 
 export const mapCommentDbToCommentView = (
   dbModel: CommentDbModel,
+  viewerId?: string
 ): CommentViewModel => {
 
   const reactions = dbModel.likes ?? [];

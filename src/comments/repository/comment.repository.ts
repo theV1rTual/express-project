@@ -28,14 +28,14 @@ export const commentRepository = {
     return { items, totalCount };
   },
 
-  async findById(id: string) {
+  async findById(id: string, viewerId?: string) {
     const commentDb = await commentsCollection.findOne({
       _id: new ObjectId(id),
     });
     if (!commentDb) {
       return null;
     }
-    return mapCommentDbToCommentView(commentDb);
+    return mapCommentDbToCommentView(commentDb, viewerId);
   },
 
   async create(newComment: CommentInputDto): Promise<CommentViewModel> {
