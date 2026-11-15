@@ -4,7 +4,7 @@ import { deleteCommentHandler } from './handlers/delete-comment.handler';
 import { updateCommentLikeHandler } from './handlers/update-comment-like.handler'
 import { accessTokenGuard } from '../../auth/guards/access.token.guard';
 import { updateCommentHandler } from './handlers/update-comment.handler';
-import { commentCreateInputValidation } from '../validation/comment.input-dto.validation-middlewares';
+import { commentCreateInputValidation, likeStatusValidation } from '../validation/comment.input-dto.validation-middlewares';
 import { inputValidationResultMiddleware } from '../../core/middlewares/validation/input-validation-result.middleware';
 
 export const commentsRouter = Router({});
@@ -18,5 +18,5 @@ commentsRouter
     inputValidationResultMiddleware,
     updateCommentHandler,
   )
-  .put('/:id/like-status', accessTokenGuard, updateCommentLikeHandler)
+  .put('/:id/like-status', accessTokenGuard, likeStatusValidation, updateCommentLikeHandler)
   .delete('/:id', accessTokenGuard, deleteCommentHandler);

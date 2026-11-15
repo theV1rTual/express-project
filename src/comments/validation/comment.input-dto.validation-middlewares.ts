@@ -7,4 +7,10 @@ const contentValidation = body('content')
   .isLength({ min: 20, max: 300 })
   .withMessage('Content cannot be more than 300 and less than 20');
 
+export const likeStatusValidation = body('likeStatus')
+  .isString()
+  .bail()
+  .isIn(['Like', 'Dislike', 'None'])
+  .withMessage('likeStatus must be Like, Dislike, or None');
+
 export const commentCreateInputValidation = [contentValidation];
