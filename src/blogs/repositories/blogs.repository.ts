@@ -1,6 +1,5 @@
 import { BlogViewModel } from '../types/BlogViewModel';
 import { BlogInputDto } from '../dto/blog.input-dto';
-import { blogsCollection } from '../../db/mongo.db';
 import { ObjectId } from 'mongodb';
 import { BlogDbModel } from '../types/BlogDbModel';
 import { mapBlogDbToViewModel } from '../routers/mappers/mapBlogDbToBlogView';
@@ -22,19 +21,18 @@ export const blogsRepository = {
 
     const mongoSortDirection = sortDirection === 'asc' ? 1 : -1;
 
-    const items = await blogsCollection
+    const items = await BlogDbModel
       .find(filter)
       .sort({ [sortBy]: mongoSortDirection })
       .skip(skip)
       .limit(pageSize)
-      .toArray();
-    const totalCount = await blogsCollection.countDocuments(filter);
+    const totalCount = await BlogDbModel.countDocuments(filter);
 
     return { items, totalCount };
   },
 
   async findById(id: string): Promise<BlogViewModel | null> {
-    const blogDb = await blogsCollection.findOne({ _id: new ObjectId(id) });
+    const blogDb = await BlogDbModel.findOne({ _id: new ObjectId(id) });
     if (!blogDb) return null;
 
     return mapBlogDbToViewModel(blogDb);
@@ -50,19 +48,19 @@ export const blogsRepository = {
       _id: new ObjectId(),
     };
 
-    await blogsCollection.insertOne(docToInsert);
+    await BlogDbModel.insertOne(docToInsert);
 
     return mapBlogDbToViewModel(docToInsert);
   },
 
   async update(id: string, dto: BlogInputDto): Promise<boolean> {
-    const blog = await blogsCollection.findOne({ _id: new ObjectId(id) });
+    const blog = await BlogDbModel.findOne({ _id: new ObjectId(id) });
 
     if (!blog) {
       throw new Error('Blog not exists');
     }
 
-    const updatedResult = await blogsCollection.updateOne(
+    const updatedResult = await BlogDbModel.updateOne(
       {
         _id: new ObjectId(id),
       },
@@ -79,7 +77,7 @@ export const blogsRepository = {
   },
 
   async delete(id: string): Promise<boolean> {
-    const deletedResult = await blogsCollection.deleteOne({
+    const deletedResult = await BlogDbModel.deleteOne({
       _id: new ObjectId(id),
     });
 
@@ -87,6 +85,6 @@ export const blogsRepository = {
   },
 
   async clear(): Promise<void> {
-    await blogsCollection.deleteMany({});
+    await BlogDbModel.deleteMany({});
   },
 };

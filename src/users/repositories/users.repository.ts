@@ -1,6 +1,5 @@
 import { UserQueryInput } from '../routers/input/user-query.input';
 import { UserDbModel } from '../types/UserDbModel';
-import { usersCollection } from '../../db/mongo.db';
 import { ObjectId } from 'mongodb';
 import { UserViewModel } from '../types/UserViewModel';
 import { mapUserDbToUserView } from '../routers/mappers/mapUserDbToUserView';
@@ -43,14 +42,13 @@ export const usersRepository = {
 
     const mongoSortDirection = sortDirection === 'asc' ? 1 : -1;
 
-    const items = await usersCollection
+    const items = await UserDbModel
       .find(filter)
       .sort({ [sortBy]: mongoSortDirection })
       .skip(skip)
       .limit(pageSize)
-      .toArray();
 
-    const totalCount = await usersCollection.countDocuments(filter);
+    const totalCount = await UserDbModel.countDocuments(filter);
     return { items, totalCount };
   },
 
@@ -58,7 +56,7 @@ export const usersRepository = {
     id: string,
     meRequest?: boolean,
   ): Promise<UserViewModel | UserMeModel | null> {
-    const userDb = await usersCollection.findOne({
+    const userDb = await UserDbModel.findOne({
       _id: new ObjectId(id),
     });
     if (!userDb) {
@@ -73,27 +71,27 @@ export const usersRepository = {
   },
 
   async findByLogin(login: string) {
-    return usersCollection.findOne({ login });
+    return UserDbModel.findOne({ login });
   },
 
   async findByEmail(email: string) {
-    return usersCollection.findOne({ email });
+    return UserDbModel.findOne({ email });
   },
 
   async findByEmailOrLogin(emailOrLogin: string) {
-    return usersCollection.findOne({
+    return UserDbModel.findOne({
       $or: [{ login: emailOrLogin }, { email: emailOrLogin }],
     });
   },
 
   async doesExistByLoginOrEmail(login: string, email: string) {
-    return usersCollection.findOne({
+    return UserDbModel.findOne({
       $or: [{ login: login }, { email: email }],
     });
   },
 
   async findByCode(code: string) {
-    return usersCollection.findOne({
+    return UserDbModel.findOne({
       'emailConfirmation.confirmationCode': code,
     });
   },
@@ -117,7 +115,7 @@ export const usersRepository = {
       };
     }
 
-    const result = await usersCollection.updateOne(
+    const result = await UserDbModel.updateOne(
       {
         _id: user._id,
       },
@@ -168,7 +166,7 @@ export const usersRepository = {
       },
       refreshToken: null,
     };
-    await usersCollection.insertOne(docToInsert);
+    await UserDbModel.insertOne(docToInsert);
 
     if (registration) {
       return docToInsert;
@@ -181,7 +179,7 @@ export const usersRepository = {
     id: ObjectId,
     payload: UserDbModel['emailConfirmation'],
   ) {
-    const result = await usersCollection.updateOne(
+    const result = await UserDbModel.updateOne(
       {
         _id: new ObjectId(id),
       },
@@ -193,7 +191,7 @@ export const usersRepository = {
   },
 
   async setRecovery(id: ObjectId, payload: UserDbModel['passwordRecovery']) {
-    const result = await usersCollection.updateOne(
+    const result = await UserDbModel.updateOne(
       {
         _id: new ObjectId(id)
       },
@@ -207,7 +205,7 @@ export const usersRepository = {
     recoveryCode: string,
     passwordHash: string,
   ): Promise<boolean> {
-    const result = await usersCollection.updateOne(
+    const result = await UserDbModel.updateOne(
       {
         'passwordRecovery.recoveryCode': recoveryCode,
         'passwordRecovery.expirationDate': { $gt: new Date() },
@@ -225,7 +223,7 @@ export const usersRepository = {
   },
 
   async delete(id: string): Promise<boolean> {
-    const deletedResult = await usersCollection.deleteOne({
+    const deletedResult = await UserDbModel.deleteOne({
       _id: new ObjectId(id),
     });
 
@@ -233,6 +231,6 @@ export const usersRepository = {
   },
 
   async clear(): Promise<void> {
-    await usersCollection.deleteMany({});
+    await UserDbModel.deleteMany({});
   },
 };

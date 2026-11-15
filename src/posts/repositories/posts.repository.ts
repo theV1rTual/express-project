@@ -1,6 +1,5 @@
 import { PostViewModel } from '../types/PostViewModel';
 import { PostInputDto } from '../dto/post.input-dto';
-import { postsCollection } from '../../db/mongo.db';
 import { ObjectId } from 'mongodb';
 import { mapPostDbToPostView } from '../routers/mappers/mapPostDbToPostView';
 import { PostDbModel } from '../types/PostDbModel';
@@ -23,19 +22,18 @@ export class PostsRepository {
 
     const mongoSortDirection = sortDirection === 'asc' ? 1 : -1;
 
-    const items = await postsCollection
+    const items = await PostDbModel
       .find(filter)
       .sort({ [sortBy]: mongoSortDirection })
       .skip(skip)
       .limit(pageSize)
-      .toArray();
 
-    const totalCount = await postsCollection.countDocuments(filter);
+    const totalCount = await PostDbModel.countDocuments(filter);
     return { items, totalCount };
   }
 
   async findById(id: string): Promise<PostViewModel | null> {
-    const postDb = await postsCollection.findOne({ _id: new ObjectId(id) });
+    const postDb = await PostDbModel.findOne({ _id: new ObjectId(id) });
     if (!postDb) {
       return null;
     }
@@ -58,12 +56,12 @@ export class PostsRepository {
       blogId: newPost.blogId,
       blogName: blog?.name as string,
     };
-    await postsCollection.insertOne(docToInsert);
+    await PostDbModel.insertOne(docToInsert);
     return mapPostDbToPostView(docToInsert);
   }
 
   async update(id: string, dto: PostInputDto): Promise<boolean> {
-    const updatedResult = await postsCollection.updateOne(
+    const updatedResult = await PostDbModel.updateOne(
       {
         _id: new ObjectId(id),
       },
@@ -81,7 +79,7 @@ export class PostsRepository {
   }
 
   async delete(id: string): Promise<boolean> {
-    const deletedResult = await postsCollection.deleteOne({
+    const deletedResult = await PostDbModel.deleteOne({
       _id: new ObjectId(id),
     });
 
@@ -89,6 +87,6 @@ export class PostsRepository {
   }
 
   async clear(): Promise<void> {
-    await postsCollection.deleteMany({});
+    await PostDbModel.deleteMany({});
   }
 };

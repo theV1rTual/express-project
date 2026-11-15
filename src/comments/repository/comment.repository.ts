@@ -48,6 +48,7 @@ export const commentRepository = {
       },
       content: newComment.content,
       createdAt: new Date(),
+      likes: []
     };
 
     await commentsCollection.insertOne(docToInsert);
@@ -73,6 +74,36 @@ export const commentRepository = {
     );
 
     return updatedResult.modifiedCount === 1;
+  },
+
+  async updateLikeForComment(commentId: string,
+    userId: string,
+    likeStatus: 'Like' | 'Dislike',) {
+    const result = await commentsCollection.updateOne(
+      { _id: new ObjectId(commentId) },
+      [
+        {
+          $set: {
+            likes: {
+              $concatArrays: [
+                {
+                  $filter: {
+                    input: { $ifNull: ['$likes', []] },
+                    as: 'reaction',
+                    cond: { $ne: ['$$reaction.userId', { $literal: userId }] },
+                  },
+                },
+                { $literal: [{ userId, status: likeStatus }] },
+              ],
+            },
+          },
+        },
+      ],
+    );
+
+
+    return result.matchedCount === 1;
+
   },
 
   async delete(id: string) {
