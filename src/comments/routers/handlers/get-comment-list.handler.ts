@@ -8,11 +8,18 @@ import { mapToCommentListPaginatedOutput } from '../mappers/mapToCommentListPagi
 import { PostsRepository } from '../../../posts/repositories/posts.repository';
 import { HttpStatuses } from '../../../core/types/http-statuses';
 import { container } from '../../../composition-root';
+import { jwtService } from '../../../auth/adapters/jwt.service';
 
 const postsRepository = container.get(PostsRepository)
 
 export async function getCommentListHandler(req: Request<{ postId: string }>, res: Response) {
   try {
+    const [scheme, token] = req.headers.authorization?.split(' ') ?? [];
+    const payload = scheme === 'Bearer' && token
+      ? await jwtService.verifyToken(token)
+      : null;
+    const viewerId = payload?.userId;
+
     const postId = req.params.postId;
     const post = await postsRepository.findById(postId);
     if (!post) {
@@ -36,7 +43,7 @@ export async function getCommentListHandler(req: Request<{ postId: string }>, re
         pageSize: queryInput.pageSize,
         totalCount,
       },
-      req.user?.id);
+      viewerId);
 
     res.send(commentsListOutput);
   } catch (e) {
