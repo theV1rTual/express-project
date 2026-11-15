@@ -18,5 +18,5 @@ commentsRouter
     inputValidationResultMiddleware,
     updateCommentHandler,
   )
-  .put('/:id/like-status', accessTokenGuard, likeStatusValidation, updateCommentLikeHandler)
+  .put('/:id/like-status', accessTokenGuard, likeStatusValidation, inputValidationResultMiddleware, updateCommentLikeHandler)
   .delete('/:id', accessTokenGuard, deleteCommentHandler);
