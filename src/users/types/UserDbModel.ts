@@ -30,8 +30,8 @@ export const UserDbModelSchema = new Schema<UserDbModel>({
     isConfirmed: { type: Boolean, required: true }
   },
   passwordRecovery: {
-    recoveryCode: { type: String, required: true, default: null },
-    expirationDate: { type: Date, required: true, default: null }
+    recoveryCode: { type: String, default: null },
+    expirationDate: { type: Date, default: null }
   },
   refreshToken: { type: String, default: null }
 })
