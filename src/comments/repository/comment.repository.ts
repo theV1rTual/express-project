@@ -48,6 +48,7 @@ export const commentRepository = {
       },
       content: newComment.content,
       createdAt: new Date(),
+      likes: []
     };
 
     await commentsCollection.insertOne(docToInsert);
