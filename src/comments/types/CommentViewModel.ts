@@ -5,4 +5,9 @@ export type CommentViewModel = {
   content: string;
   commentatorInfo: CommentatorInfo;
   createdAt: Date;
+  likesInfo: {
+    likesCount: number;
+    dislikesCount: number;
+    myStatus: 'Like' | 'Dislike' | 'None';
+  };
 };
