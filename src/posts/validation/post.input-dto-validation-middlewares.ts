@@ -53,3 +53,9 @@ export const postUpdateInputValidation = [
   contentValidation,
   blogIdValidation,
 ];
+
+export const postLikeStatusValidation = body('likeStatus')
+  .isString()
+  .bail()
+  .isIn(['Like', 'Dislike', 'None'])
+  .withMessage('likeStatus must be Like, Dislike, or None');

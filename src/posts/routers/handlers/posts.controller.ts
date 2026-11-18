@@ -10,21 +10,25 @@ import { setDefaultSortAndPagination } from '../../../core/helpers/set-default-s
 import { PostQueryInput } from '../input /post-query.input';
 import { mapToBlogListPaginatedOutput } from '../mappers/mapToPostListPaginatedOutput.utils';
 import { errorsHandler } from '../../../core/errors/errors.handler';
+import { LikeStatus } from '../../types/like-status';
+import { ResultStatus } from '../../../core/result /resultCode';
 
 export class PostController {
   constructor(
     @inject(PostsService)
-    private postsService: PostsService
-  ) { }
+    private postsService: PostsService,
+  ) {}
 
   async getPost(req: Request<{ id: string }>, res: Response) {
     const id = req.params.id;
-    const post = await this.postsService.findById(id);
+    const post = await this.postsService.findById(id, req.user?.id);
 
     if (!post) {
       res
         .status(HttpStatuses.NOT_FOUND)
-        .send(createErrorMessages([{ field: 'id', message: 'Post not exists' }]));
+        .send(
+          createErrorMessages([{ field: 'id', message: 'Post not exists' }]),
+        );
       return;
     }
 
@@ -46,11 +50,15 @@ export class PostController {
       const result = await this.postsService.findMany(queryInput);
       if (!result) return res.sendStatus(HttpStatuses.NOT_FOUND);
 
-      const postsListOutput = mapToBlogListPaginatedOutput(result.items, {
-        page: queryInput.pageNumber,
-        pageSize: queryInput.pageSize,
-        totalCount: result.totalCount,
-      });
+      const postsListOutput = mapToBlogListPaginatedOutput(
+        result.items,
+        {
+          page: queryInput.pageNumber,
+          pageSize: queryInput.pageSize,
+          totalCount: result.totalCount,
+        },
+        req.user?.id,
+      );
 
       res.send(postsListOutput);
     } catch (e: unknown) {
@@ -58,7 +66,29 @@ export class PostController {
     }
   }
 
-  async createPost(req: Request<{}, {}, PostInputDto>, res: Response,) {
+  async updateLikeStatus(
+    req: Request<{ postId: string }, {}, { likeStatus: LikeStatus }>,
+    res: Response,
+  ) {
+    if (!req.user?.id) return res.sendStatus(HttpStatuses.UNAUTHORIZED);
+    try {
+      const status = await this.postsService.updateLikeStatus(
+        req.params.postId,
+        req.user.id,
+        req.body.likeStatus,
+      );
+      if (status === ResultStatus.Unauthorized)
+        return res.sendStatus(HttpStatuses.UNAUTHORIZED);
+      if (status === ResultStatus.NotFound)
+        return res.sendStatus(HttpStatuses.NOT_FOUND);
+      return res.sendStatus(HttpStatuses.NO_CONTENT);
+    } catch (error: unknown) {
+      console.error(error);
+      return res.sendStatus(HttpStatuses.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async createPost(req: Request<{}, {}, PostInputDto>, res: Response) {
     const newPost: PostInputDto = {
       title: req.body.title,
       shortDescription: req.body.shortDescription,
@@ -81,7 +111,9 @@ export class PostController {
     if (!post) {
       res
         .status(HttpStatuses.NOT_FOUND)
-        .send(createErrorMessages([{ field: 'id', message: 'Post not exists' }]));
+        .send(
+          createErrorMessages([{ field: 'id', message: 'Post not exists' }]),
+        );
       return;
     }
 
@@ -101,7 +133,9 @@ export class PostController {
     if (!post) {
       res
         .status(HttpStatuses.NOT_FOUND)
-        .send(createErrorMessages([{ field: 'id', message: 'Post not found' }]));
+        .send(
+          createErrorMessages([{ field: 'id', message: 'Post not found' }]),
+        );
 
       return;
     }

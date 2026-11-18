@@ -17,10 +17,11 @@ import { createPostForBlogHandler } from './handlers/create-post-for-blog.handle
 import { PostSortFields } from '../../posts/routers/input /post-sort-fields';
 import { container } from '../../composition-root';
 import { PostController } from '../../posts/routers/handlers/posts.controller';
+import { optionalAccessTokenGuard } from '../../auth/guards/optional-access-token.guard';
 
 export const blogsRouter = Router({});
 
-const postController = container.get(PostController)
+const postController = container.get(PostController);
 
 blogsRouter
   .get('', paginationAndSortingValidation(BlogSortField), getBlogsListHandler)
@@ -33,6 +34,7 @@ blogsRouter
   )
   .get(
     '/:id/posts',
+    optionalAccessTokenGuard,
     paginationAndSortingValidation(PostSortFields),
     postController.getPostsList.bind(postController),
   )

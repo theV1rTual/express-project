@@ -4,6 +4,7 @@ import { inputValidationResultMiddleware } from '../../core/middlewares/validati
 import {
   postCreateInputValidation,
   postUpdateInputValidation,
+  postLikeStatusValidation,
 } from '../validation/post.input-dto-validation-middlewares';
 import { paginationAndSortingValidation } from '../../core/middlewares/validation/query-pagination-sorting.validation-middleware';
 import { PostSortFields } from './input /post-sort-fields';
@@ -14,14 +15,31 @@ import { createCommentHandler } from '../../comments/routers/handlers/create-com
 import { CommentSortField } from '../../comments/routers/input/comment-sort-field';
 import { PostController } from './handlers/posts.controller';
 import { container } from '../../composition-root';
+import { optionalAccessTokenGuard } from '../../auth/guards/optional-access-token.guard';
 
 export const postRouter = Router({});
 
-const postController = container.get(PostController)
+const postController = container.get(PostController);
 
 postRouter
-  .get('', paginationAndSortingValidation(PostSortFields), postController.getPostsList.bind(postController))
-  .get('/:id', postController.getPost.bind(postController))
+  .get(
+    '',
+    optionalAccessTokenGuard,
+    paginationAndSortingValidation(PostSortFields),
+    postController.getPostsList.bind(postController),
+  )
+  .get(
+    '/:id',
+    optionalAccessTokenGuard,
+    postController.getPost.bind(postController),
+  )
+  .put(
+    '/:postId/like-status',
+    accessTokenGuard,
+    postLikeStatusValidation,
+    inputValidationResultMiddleware,
+    postController.updateLikeStatus.bind(postController),
+  )
   .post(
     '/',
     superAdminGuardMiddleware,
@@ -48,4 +66,8 @@ postRouter
     paginationAndSortingValidation(CommentSortField),
     getCommentListHandler,
   )
-  .delete('/:id', superAdminGuardMiddleware, postController.delete.bind(postController));
+  .delete(
+    '/:id',
+    superAdminGuardMiddleware,
+    postController.delete.bind(postController),
+  );

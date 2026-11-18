@@ -6,6 +6,7 @@ import { PostDbModel } from '../types/PostDbModel';
 import { blogsRepository } from '../../blogs/repositories/blogs.repository';
 import { PostQueryInput } from '../routers/input /post-query.input';
 import { injectable } from 'inversify';
+import { LikeStatus } from '../types/like-status';
 
 @injectable()
 export class PostsRepository {
@@ -22,22 +23,22 @@ export class PostsRepository {
 
     const mongoSortDirection = sortDirection === 'asc' ? 1 : -1;
 
-    const items = await PostDbModel
-      .find(filter)
+    const items = await PostDbModel.find(filter)
       .sort({ [sortBy]: mongoSortDirection })
       .skip(skip)
-      .limit(pageSize)
+      .limit(pageSize);
 
     const totalCount = await PostDbModel.countDocuments(filter);
     return { items, totalCount };
   }
 
-  async findById(id: string): Promise<PostViewModel | null> {
+  async findById(id: string, viewerId?: string): Promise<PostViewModel | null> {
+    if (!ObjectId.isValid(id)) return null;
     const postDb = await PostDbModel.findOne({ _id: new ObjectId(id) });
     if (!postDb) {
       return null;
     }
-    return mapPostDbToPostView(postDb);
+    return mapPostDbToPostView(postDb, viewerId);
   }
 
   async create(newPost: PostInputDto): Promise<PostViewModel | null> {
@@ -55,10 +56,65 @@ export class PostsRepository {
       title: newPost.title,
       blogId: newPost.blogId,
       blogName: blog?.name as string,
-      likes: []
+      likes: [],
     };
     await PostDbModel.insertOne(docToInsert);
     return mapPostDbToPostView(docToInsert);
+  }
+
+  async updateLikeStatus(
+    postId: string,
+    userId: string,
+    login: string,
+    likeStatus: LikeStatus,
+  ): Promise<boolean> {
+    if (!ObjectId.isValid(postId)) return false;
+
+    const reactions = { $ifNull: ['$likes', []] };
+    const sameReaction = {
+      $filter: {
+        input: reactions,
+        as: 'reaction',
+        cond: {
+          $and: [
+            { $eq: ['$$reaction.userId', { $literal: userId }] },
+            { $eq: ['$$reaction.status', { $literal: likeStatus }] },
+          ],
+        },
+      },
+    };
+    const otherReactions = {
+      $filter: {
+        input: reactions,
+        as: 'reaction',
+        cond: { $ne: ['$$reaction.userId', { $literal: userId }] },
+      },
+    };
+    const newReaction =
+      likeStatus === 'None'
+        ? []
+        : [{ userId, login, status: likeStatus, addedAt: new Date() }];
+
+    // A single document update avoids losing concurrent reactions.
+    // An identical status preserves the original timestamp and newest-likes order.
+    const result = await PostDbModel.updateOne(
+      { _id: new ObjectId(postId) },
+      [
+        {
+          $set: {
+            likes: {
+              $cond: [
+                { $gt: [{ $size: sameReaction }, 0] },
+                reactions,
+                { $concatArrays: [otherReactions, { $literal: newReaction }] },
+              ],
+            },
+          },
+        },
+      ],
+      { updatePipeline: true },
+    );
+    return result.matchedCount === 1;
   }
 
   async update(id: string, dto: PostInputDto): Promise<boolean> {
@@ -90,4 +146,4 @@ export class PostsRepository {
   async clear(): Promise<void> {
     await PostDbModel.deleteMany({});
   }
-};
+}

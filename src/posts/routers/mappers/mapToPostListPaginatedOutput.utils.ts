@@ -1,5 +1,6 @@
 import { PostListPaginatedOutput } from '../../types/PostListPaginated.output';
 import { PostDbModel } from '../../types/PostDbModel';
+import { mapPostDbToPostView } from './mapPostDbToPostView';
 
 export function mapToBlogListPaginatedOutput(
   posts: PostDbModel[],
@@ -8,20 +9,13 @@ export function mapToBlogListPaginatedOutput(
     pageSize: number;
     totalCount: number;
   },
+  viewerId?: string,
 ): PostListPaginatedOutput {
   return {
     pagesCount: Math.ceil(meta.totalCount / meta.pageSize),
     page: meta.page,
     pageSize: meta.pageSize,
     totalCount: meta.totalCount,
-    items: posts.map((post) => ({
-      id: post._id.toString(),
-      blogName: post.blogName,
-      blogId: post.blogId,
-      content: post.content,
-      shortDescription: post.shortDescription,
-      createdAt: post.createdAt,
-      title: post.title,
-    })),
+    items: posts.map((post) => mapPostDbToPostView(post, viewerId)),
   };
 }

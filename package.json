@@ -8,7 +8,8 @@
     "dev": "nodemon --inspect dist/index.js",
     "jest": "jest -i",
     "lint": "eslint --fix .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "test:post-likes": "tsc && node --test __tests__/integration/post-likes.cjs"
   },
   "keywords": [],
   "author": "",
