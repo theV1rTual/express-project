@@ -2,10 +2,12 @@ import { Request, Response } from 'express';
 import { CommentInputDto } from '../../dto/comment.input-dto';
 import { CommentViewModel } from '../../types/CommentViewModel';
 import { commentRepository } from '../../repository/comment.repository';
-import { usersRepository } from '../../../users/repositories/users.repository';
+import { UsersRepository } from '../../../users/infra/users.repository';
 import { PostsRepository } from '../../../posts/repositories/posts.repository';
 import { HttpStatuses } from '../../../core/types/http-statuses';
 import { container } from '../../../composition-root';
+
+const usersRepository = container.get(UsersRepository);
 
 export async function createCommentHandler(
   req: Request<{ postId: string }, {}, CommentInputDto>,

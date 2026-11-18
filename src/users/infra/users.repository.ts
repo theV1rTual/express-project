@@ -10,8 +10,9 @@ import { ResultStatus } from '../../core/result /resultCode';
 import { Result } from '../../core/result /result.type';
 import { mapUserDbToMeRequest } from '../routers/mappers/mapUserDbToMeRequest';
 import { UserMeModel } from '../types/UserMeModel';
+import { UserEntity } from '../domain/user.entity';
 
-export const usersRepository = {
+export class UsersRepository {
   async findAll(
     queryDto: UserQueryInput,
   ): Promise<{ items: UserDbModel[]; totalCount: number }> {
@@ -50,7 +51,7 @@ export const usersRepository = {
 
     const totalCount = await UserDbModel.countDocuments(filter);
     return { items, totalCount };
-  },
+  }
 
   async findById(
     id: string,
@@ -68,33 +69,33 @@ export const usersRepository = {
     }
 
     return mapUserDbToUserView(userDb);
-  },
+  }
 
   async findByLogin(login: string) {
     return UserDbModel.findOne({ login });
-  },
+  }
 
   async findByEmail(email: string) {
     return UserDbModel.findOne({ email });
-  },
+  }
 
   async findByEmailOrLogin(emailOrLogin: string) {
     return UserDbModel.findOne({
       $or: [{ login: emailOrLogin }, { email: emailOrLogin }],
     });
-  },
+  }
 
   async doesExistByLoginOrEmail(login: string, email: string) {
     return UserDbModel.findOne({
       $or: [{ login: login }, { email: email }],
     });
-  },
+  }
 
   async findByCode(code: string) {
     return UserDbModel.findOne({
       'emailConfirmation.confirmationCode': code,
     });
-  },
+  }
 
   async confirmRegistration(code: string): Promise<Result<null>> {
     const user = await this.findByCode(code);
@@ -139,41 +140,33 @@ export const usersRepository = {
       data: null,
       extensions: [],
     };
-  },
+  }
 
   async createUser(
-    user: UserInputDto,
-    passwordHash: string,
-    registration?: boolean,
-  ): Promise<UserViewModel | null | UserDbModel> {
+    user: UserEntity,
+  ): Promise<UserDbModel> {
     const docToInsert: UserDbModel = {
       _id: new ObjectId(),
-      createdAt: new Date(),
+      createdAt: user.createdAt,
       login: user.login,
       email: user.email,
-      passwordHash,
-      emailConfirmation: {
-        confirmationCode: randomUUID(),
-        expirationDate: add(new Date(), {
-          hours: 1,
-          minutes: 30,
-        }),
-        isConfirmed: false,
-      },
-      passwordRecovery: {
-        recoveryCode: null,
-        expirationDate: null,
-      },
+      passwordHash: user.passwordHash,
+      emailConfirmation: user.emailConfirmation,
+      passwordRecovery: user.passwordRecovery,
+      // passwordRecovery: {
+      //   recoveryCode: null,
+      //   expirationDate: null,
+      // },
       refreshToken: null,
     };
-    await UserDbModel.insertOne(docToInsert);
+    const savedUser = await UserDbModel.insertOne(docToInsert);
+    return savedUser.toObject();
+    // if (registration) {
+    //   return docToInsert;
+    // }
 
-    if (registration) {
-      return docToInsert;
-    }
-
-    return mapUserDbToUserView(docToInsert);
-  },
+    // return mapUserDbToUserView(docToInsert);
+  }
 
   async setConfirmation(
     id: ObjectId,
@@ -188,7 +181,7 @@ export const usersRepository = {
       },
     );
     return result.matchedCount === 1;
-  },
+  }
 
   async setRecovery(id: ObjectId, payload: UserDbModel['passwordRecovery']) {
     const result = await UserDbModel.updateOne(
@@ -199,7 +192,7 @@ export const usersRepository = {
         $set: { passwordRecovery: payload }
       }
     )
-  },
+  }
 
   async updatePasswordByRecoveryCode(
     recoveryCode: string,
@@ -220,17 +213,21 @@ export const usersRepository = {
     );
 
     return result.matchedCount === 1;
-  },
+  }
 
   async delete(id: string): Promise<boolean> {
+    if (!ObjectId.isValid(id)) {
+      return false;
+    }
+
     const deletedResult = await UserDbModel.deleteOne({
       _id: new ObjectId(id),
     });
 
     return deletedResult.deletedCount === 1;
-  },
+  }
 
   async clear(): Promise<void> {
     await UserDbModel.deleteMany({});
-  },
+  }
 };

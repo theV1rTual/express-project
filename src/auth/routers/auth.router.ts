@@ -13,7 +13,7 @@ import {
   passwordValidation,
 } from '../../users/validation/user.input-dto.validation-middlewares';
 import { accessTokenGuard } from '../guards/access.token.guard';
-import { usersRepository } from '../../users/repositories/users.repository';
+import { UsersRepository } from '../../users/infra/users.repository';
 import { createErrorMessages } from '../../core/utils/error.utils';
 import { jwtService } from '../adapters/jwt.service';
 import { ObjectId } from 'mongodb';
@@ -26,8 +26,10 @@ import { add } from 'date-fns/add';
 import { SETTINGS } from '../../core/settings/settings';
 import { ipUrlRateLimiterMiddleware } from '../../core/middlewares/ipUrlRateLimiter.middleware';
 import { body } from 'express-validator';
+import { container } from '../../composition-root';
 
 export const authRouter = Router({});
+const usersRepository = container.get(UsersRepository);
 
 authRouter.post(
   routersPaths.auth.login,

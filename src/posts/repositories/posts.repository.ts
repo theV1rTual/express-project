@@ -55,6 +55,7 @@ export class PostsRepository {
       title: newPost.title,
       blogId: newPost.blogId,
       blogName: blog?.name as string,
+      likes: []
     };
     await PostDbModel.insertOne(docToInsert);
     return mapPostDbToPostView(docToInsert);

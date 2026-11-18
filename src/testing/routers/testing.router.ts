@@ -2,7 +2,7 @@ import { Request, Response, Router } from 'express';
 import { HttpStatuses } from '../../core/types/http-statuses';
 import { blogsRepository } from '../../blogs/repositories/blogs.repository';
 import { PostsRepository } from '../../posts/repositories/posts.repository';
-import { usersRepository } from '../../users/repositories/users.repository';
+import { UsersRepository } from '../../users/infra/users.repository';
 import { commentRepository } from '../../comments/repository/comment.repository';
 import {
   apiRequestLogCollection,
@@ -13,6 +13,7 @@ import { container } from '../../composition-root';
 export const testingRouter = Router({});
 
 const postsRepository = container.get(PostsRepository)
+const usersRepository = container.get(UsersRepository)
 
 testingRouter.delete('/all-data', async (req: Request, res: Response) => {
   await blogsRepository.clear();
